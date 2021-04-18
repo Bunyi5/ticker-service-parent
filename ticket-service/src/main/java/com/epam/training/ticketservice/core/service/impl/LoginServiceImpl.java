@@ -44,7 +44,7 @@ public class LoginServiceImpl implements LoginService {
         try {
             Account account = getSignedInAccount();
 
-            if (isAccountAdmin(account)) {
+            if (account.isAccountAdmin()) {
                 return "Signed in with privileged account '" + account.getUsername() + "'";
             } else {
                 return "Signed in with account '" + account.getUsername() + "'";
@@ -67,8 +67,14 @@ public class LoginServiceImpl implements LoginService {
         return authPrinciple.getAccount();
     }
 
-    private boolean isAccountAdmin(Account account) {
-        return account.getUsername().equals("admin");
+    @Override
+    public boolean isSignedInAccountAdmin() {
+        try {
+            Account account = getSignedInAccount();
+            return account.isAccountAdmin();
+        } catch (AuthenticationCredentialsNotFoundException e) {
+            return false;
+        }
     }
 
     private AccountDetails getAuthPrinciple(Object principal) {
