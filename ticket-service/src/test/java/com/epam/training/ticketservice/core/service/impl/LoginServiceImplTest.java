@@ -1,6 +1,7 @@
 package com.epam.training.ticketservice.core.service.impl;
 
 import com.epam.training.ticketservice.core.persistence.entity.Account;
+import com.epam.training.ticketservice.core.service.AuthenticationService;
 import com.epam.training.ticketservice.core.service.LoginService;
 import com.epam.training.ticketservice.core.service.model.AccountDetails;
 import org.junit.jupiter.api.Assertions;
@@ -12,9 +13,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -26,21 +24,18 @@ public class LoginServiceImplTest {
     @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
-    private SecurityContext securityContext;
-    @Mock
     private UserDetailsService userDetailsService;
+    @Mock
+    private AuthenticationService authenticationService;
 
     private Account adminAccount;
     private AccountDetails adminAccountDetails;
-    private UsernamePasswordAuthenticationToken adminUsernamePasswordAuthenticationToken;
 
     private Account userAccount;
-    private AccountDetails userAccountDetails;
-    private UsernamePasswordAuthenticationToken userUsernamePasswordAuthenticationToken;
 
     @BeforeEach
     public void init() {
-        loginService = new LoginServiceImpl(passwordEncoder, userDetailsService);
+        loginService = new LoginServiceImpl(passwordEncoder, userDetailsService, authenticationService);
 
         adminAccount = new Account();
         adminAccount.setId(200L);
@@ -49,13 +44,8 @@ public class LoginServiceImplTest {
 
         adminAccountDetails = new AccountDetails(adminAccount);
 
-        adminUsernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(adminAccountDetails, null, null);
-
-        userAccount = new Account(100L, "test", "test");
-        userAccountDetails = new AccountDetails(userAccount);
-        userUsernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(userAccountDetails, null, null);
+        userAccount = new Account(100L, "test",
+                "$2y$04$4xBBVeTKzpGQfnSnaY7CB.rYzcOAcX62f3mjNqKmlE/29sCx0x5wC");
     }
 
     @Test
@@ -64,7 +54,6 @@ public class LoginServiceImplTest {
         String username = "admin";
         String password = "admin";
 
-        SecurityContextHolder.setContext(securityContext);
         Mockito.when(userDetailsService
                 .loadUserByUsername(adminAccount.getUsername()))
                 .thenReturn(adminAccountDetails);
@@ -78,8 +67,8 @@ public class LoginServiceImplTest {
         // Then
         Mockito.verify(userDetailsService).loadUserByUsername(adminAccount.getUsername());
         Mockito.verify(passwordEncoder).matches(password, adminAccount.getPassword());
-        Mockito.verify(securityContext).setAuthentication(adminUsernamePasswordAuthenticationToken);
-        Mockito.verifyNoMoreInteractions(userDetailsService, passwordEncoder, securityContext);
+        Mockito.verify(authenticationService).setAuthentication(adminAccountDetails);
+        Mockito.verifyNoMoreInteractions(userDetailsService, passwordEncoder, authenticationService);
     }
 
     @Test
@@ -107,15 +96,12 @@ public class LoginServiceImplTest {
 
     @Test
     public void testSignOutShouldSignOutTheAccount() {
-        // Given
-        SecurityContextHolder.setContext(securityContext);
-
         // When
         loginService.signOut();
 
         // Then
-        Mockito.verify(securityContext).setAuthentication(null);
-        Mockito.verifyNoMoreInteractions(securityContext);
+        Mockito.verify(authenticationService).clearAuthentication();
+        Mockito.verifyNoMoreInteractions(authenticationService);
     }
 
     @Test
@@ -123,16 +109,15 @@ public class LoginServiceImplTest {
         // Given
         String expected = "Signed in with privileged account '" + adminAccount.getUsername() + "'";
 
-        SecurityContextHolder.setContext(securityContext);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(adminUsernamePasswordAuthenticationToken);
+        Mockito.when(authenticationService.getSignedInAccount()).thenReturn(adminAccount);
 
         // When
         String actual = loginService.describeAccount();
 
         // Then
         Assertions.assertEquals(expected, actual);
-        Mockito.verify(securityContext).getAuthentication();
-        Mockito.verifyNoMoreInteractions(securityContext);
+        Mockito.verify(authenticationService).getSignedInAccount();
+        Mockito.verifyNoMoreInteractions(authenticationService);
     }
 
     @Test
@@ -140,16 +125,15 @@ public class LoginServiceImplTest {
         // Given
         String expected = "Signed in with account '" + userAccount.getUsername() + "'";
 
-        SecurityContextHolder.setContext(securityContext);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(userUsernamePasswordAuthenticationToken);
+        Mockito.when(authenticationService.getSignedInAccount()).thenReturn(userAccount);
 
         // When
         String actual = loginService.describeAccount();
 
         // Then
         Assertions.assertEquals(expected, actual);
-        Mockito.verify(securityContext).getAuthentication();
-        Mockito.verifyNoMoreInteractions(securityContext);
+        Mockito.verify(authenticationService).getSignedInAccount();
+        Mockito.verifyNoMoreInteractions(authenticationService);
     }
 
     @Test
@@ -157,107 +141,15 @@ public class LoginServiceImplTest {
         // Given
         String expected = "You are not signed in";
 
-        SecurityContextHolder.setContext(securityContext);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(null);
+        Mockito.when(authenticationService.getSignedInAccount())
+                .thenThrow(AuthenticationCredentialsNotFoundException.class);
 
         // When
         String actual = loginService.describeAccount();
 
         // Then
         Assertions.assertEquals(expected, actual);
-        Mockito.verify(securityContext).getAuthentication();
-        Mockito.verifyNoMoreInteractions(securityContext);
-    }
-
-    @Test
-    public void testGetSignedInAccountShouldReturnsExpectedResultWhenAdminIsSignedIn() {
-        // Given
-        SecurityContextHolder.setContext(securityContext);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(adminUsernamePasswordAuthenticationToken);
-
-        // When
-        Account actual = loginService.getSignedInAccount();
-
-        // Then
-        Assertions.assertEquals(adminAccount, actual);
-        Mockito.verify(securityContext).getAuthentication();
-        Mockito.verifyNoMoreInteractions(securityContext);
-    }
-
-    @Test
-    public void testGetSignedInAccountShouldThrowExceptionWhenNoBodyIsSignedIn() {
-        // Given
-        SecurityContextHolder.setContext(securityContext);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(null);
-
-        // When
-        Assertions.assertThrows(AuthenticationCredentialsNotFoundException.class,
-                () -> loginService.getSignedInAccount());
-
-        // Then
-        Mockito.verify(securityContext).getAuthentication();
-        Mockito.verifyNoMoreInteractions(securityContext);
-    }
-
-    @Test
-    public void testGetSignedInAccountShouldThrowExceptionWhenThePrincipalIsNotSupported() {
-        // Given
-        SecurityContextHolder.setContext(securityContext);
-        Mockito.when(securityContext.getAuthentication())
-                .thenReturn(new UsernamePasswordAuthenticationToken(
-                        new Object(),
-                        null,
-                        null
-                ));
-
-        // When
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> loginService.getSignedInAccount());
-
-        // Then
-        Mockito.verify(securityContext).getAuthentication();
-        Mockito.verifyNoMoreInteractions(securityContext);
-    }
-
-    @Test
-    public void testIsSignedInAccountAdminShouldReturnTrueWhenTheAccountIsAdmin() {
-        // Given
-        SecurityContextHolder.setContext(securityContext);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(adminUsernamePasswordAuthenticationToken);
-
-        // When
-        Assertions.assertTrue(loginService.isSignedInAccountAdmin());
-
-        // Then
-        Mockito.verify(securityContext).getAuthentication();
-        Mockito.verifyNoMoreInteractions(securityContext);
-    }
-
-    @Test
-    public void testIsSignedInAccountAdminShouldReturnFalseWhenTheAccountIsUser() {
-        // Given
-        SecurityContextHolder.setContext(securityContext);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(userUsernamePasswordAuthenticationToken);
-
-        // When
-        Assertions.assertFalse(loginService.isSignedInAccountAdmin());
-
-        // Then
-        Mockito.verify(securityContext).getAuthentication();
-        Mockito.verifyNoMoreInteractions(securityContext);
-    }
-
-    @Test
-    public void testIsSignedInAccountAdminShouldReturnFalseWhenNoBodyIsSignedIn() {
-        // Given
-        SecurityContextHolder.setContext(securityContext);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(null);
-
-        // When
-        Assertions.assertFalse(loginService.isSignedInAccountAdmin());
-
-        // Then
-        Mockito.verify(securityContext).getAuthentication();
-        Mockito.verifyNoMoreInteractions(securityContext);
+        Mockito.verify(authenticationService).getSignedInAccount();
+        Mockito.verifyNoMoreInteractions(authenticationService);
     }
 }
