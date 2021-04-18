@@ -1,6 +1,6 @@
 package com.epam.training.ticketservice.ui.command;
 
-import com.epam.training.ticketservice.core.persistence.entity.Account;
+import com.epam.training.ticketservice.core.service.AuthenticationService;
 import com.epam.training.ticketservice.core.service.impl.LoginServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -16,6 +16,7 @@ import org.springframework.shell.standard.ShellOption;
 public class LoginCommand {
 
     private final LoginServiceImpl loginService;
+    private final AuthenticationService authenticationService;
 
     @ShellMethod(value = "Sign in privileged", key = "sign in privileged")
     public String signInPrivileged(@ShellOption String username, @ShellOption String password) {
@@ -40,7 +41,7 @@ public class LoginCommand {
 
     public Availability isThereASignedInAccount() {
         try {
-            Account account = loginService.getSignedInAccount();
+            authenticationService.getSignedInAccount();
             return Availability.available();
         } catch (AuthenticationCredentialsNotFoundException e) {
             return Availability.unavailable("You are not signed in");
