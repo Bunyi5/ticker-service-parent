@@ -13,6 +13,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
 
     private final AuthenticationService authenticationService;
 
+    @Override
     public Availability isThereASignedInAccount() {
         try {
             authenticationService.getSignedInAccount();
@@ -20,5 +21,12 @@ public class AvailabilityServiceImpl implements AvailabilityService {
         } catch (AuthenticationCredentialsNotFoundException e) {
             return Availability.unavailable("You are not signed in");
         }
+    }
+
+    @Override
+    public Availability isSignedInAccountAdmin() {
+        return authenticationService.isSignedInAccountAdmin()
+                ? Availability.available()
+                : Availability.unavailable("You are not an admin");
     }
 }
