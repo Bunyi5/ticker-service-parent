@@ -78,9 +78,10 @@ public class MovieServiceImplTest {
 
     @Test
     public void testDeleteMovieShouldCallMovieRepository() {
-        // When
+        // Given
         String title = "Sátántangó";
 
+        // When
         movieService.deleteMovie(title);
 
         // Then
@@ -89,7 +90,7 @@ public class MovieServiceImplTest {
     }
 
     @Test
-    public void testGetMovieDtoShouldReturnExpectedResultWhenTheMovieListContainsMovies() {
+    public void testGetMovieListShouldReturnExpectedResult() {
         // Given
         Movie movie = new Movie(null, "Sátántangó", "thriller", 450);
         MovieList expected = new MovieList(List.of(movie));
