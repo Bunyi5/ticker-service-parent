@@ -26,6 +26,7 @@
         <spring-security-test>5.4.5</spring-security-test>
         <junit.version>5.7.1</junit.version>
         <mockito.version>3.6.28</mockito.version>
+        <equalsverifier.version>3.5.5</equalsverifier.version>
 
         <surefire-maven-plugin.version>3.0.0-M5</surefire-maven-plugin.version>
         <checkstyle-maven-plugin.version>3.1.2</checkstyle-maven-plugin.version>
@@ -98,6 +99,12 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
             <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>nl.jqno.equalsverifier</groupId>
+            <artifactId>equalsverifier</artifactId>
+            <version>${equalsverifier.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
