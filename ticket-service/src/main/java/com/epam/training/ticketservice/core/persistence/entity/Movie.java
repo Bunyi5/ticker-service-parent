@@ -1,8 +1,8 @@
 package com.epam.training.ticketservice.core.persistence.entity;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,9 +11,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Movie {
 
     @Id
@@ -23,12 +23,6 @@ public class Movie {
     private String title;
     private String genre;
     private int minutes;
-
-    public Movie(String title, String genre, int minutes) {
-        this.title = title;
-        this.genre = genre;
-        this.minutes = minutes;
-    }
 
     @Override
     public String toString() {

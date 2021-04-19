@@ -2,7 +2,7 @@ package com.epam.training.ticketservice.ui.command;
 
 import com.epam.training.ticketservice.core.service.AvailabilityService;
 import com.epam.training.ticketservice.core.service.MovieService;
-import com.epam.training.ticketservice.core.service.model.MovieDto;
+import com.epam.training.ticketservice.ui.command.model.MovieList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.shell.Availability;
 import org.springframework.shell.standard.ShellComponent;
@@ -33,8 +33,8 @@ public class MovieCommand {
     }
 
     @ShellMethod(value = "List movies", key = "list movies")
-    public MovieDto listMovies() {
-        return movieService.getMovieDto();
+    public MovieList listMovies() {
+        return movieService.getMovieList();
     }
 
     @ShellMethodAvailability({"create movie", "update movie", "delete movie"})

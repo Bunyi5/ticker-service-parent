@@ -1,16 +1,18 @@
-package com.epam.training.ticketservice.core.service.model;
+package com.epam.training.ticketservice.ui.command.model;
 
 import com.epam.training.ticketservice.core.persistence.entity.Movie;
-import lombok.Setter;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Setter
-public class MovieDto {
+@EqualsAndHashCode
+@RequiredArgsConstructor
+public class MovieList {
 
-    List<Movie> movieList;
+    private final List<Movie> movieList;
 
     @Override
     public String toString() {

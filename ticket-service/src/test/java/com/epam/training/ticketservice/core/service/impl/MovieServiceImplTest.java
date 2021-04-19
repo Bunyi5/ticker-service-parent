@@ -3,18 +3,15 @@ package com.epam.training.ticketservice.core.service.impl;
 import com.epam.training.ticketservice.core.persistence.MovieRepository;
 import com.epam.training.ticketservice.core.persistence.entity.Movie;
 import com.epam.training.ticketservice.core.service.MovieService;
-import com.epam.training.ticketservice.core.service.model.MovieDto;
+import com.epam.training.ticketservice.ui.command.model.MovieList;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -26,63 +23,53 @@ public class MovieServiceImplTest {
 
     @Mock
     private MovieRepository movieRepository;
-    @Captor
-    private ArgumentCaptor<Movie> movieCaptor;
-
-    private Movie movie;
 
     @BeforeEach
     public void init() {
         movieService = new MovieServiceImpl(movieRepository);
-
-        movie = new Movie();
-        movie.setId(10L);
-        movie.setTitle("Sátántangó");
-        movie.setGenre("drama");
-        movie.setMinutes(450);
     }
 
     @Test
-    public void testCreateMovieShouldCreateMovieAndSaveIt() {
-        // When
-        movieService.createMovie(movie.getTitle(), movie.getGenre(), movie.getMinutes());
-
-        // Then
-        Mockito.verify(movieRepository).save(movieCaptor.capture());
-        Mockito.verifyNoMoreInteractions(movieRepository);
-        Assertions.assertEquals(movie.toString(), movieCaptor.getValue().toString());
-    }
-
-    @Test
-    public void testUpdateMovieShouldUpdateMovieAndSaveIt() {
+    public void testCreateMovieShouldCallMovieRepositoryWithTheRightParameters() {
         // Given
-        String genre = "thriller";
-        Movie expected = new Movie(movie.getTitle(), genre, movie.getMinutes());
-
-        Mockito.when(movieRepository.findByTitle(movie.getTitle()))
-                .thenReturn(Optional.of(movie));
+        Movie expected = new Movie(null, "Sátántangó", "drama", 450);
 
         // When
-        movieService.updateMovie(movie.getTitle(), genre, movie.getMinutes());
+        movieService.createMovie(expected.getTitle(), expected.getGenre(), expected.getMinutes());
 
         // Then
-        Mockito.verify(movieRepository).findByTitle(movie.getTitle());
-        Mockito.verify(movieRepository).save(movieCaptor.capture());
+        Mockito.verify(movieRepository).save(expected);
         Mockito.verifyNoMoreInteractions(movieRepository);
-        Assertions.assertEquals(expected.toString(), movieCaptor.getValue().toString());
+    }
+
+    @Test
+    public void testUpdateMovieShouldCallMovieRepositoryWithTheRightParameters() {
+        // Given
+        Movie expected = new Movie(null, "Sátántangó", "thriller", 450);
+
+        Mockito.when(movieRepository.findByTitle(expected.getTitle()))
+                .thenReturn(Optional.of(new Movie()));
+
+        // When
+        movieService.updateMovie(expected.getTitle(), expected.getGenre(), expected.getMinutes());
+
+        // Then
+        Mockito.verify(movieRepository).findByTitle(expected.getTitle());
+        Mockito.verify(movieRepository).save(expected);
+        Mockito.verifyNoMoreInteractions(movieRepository);
     }
 
     @Test
     public void testUpdateMovieShouldThrowExceptionWhenMovieNotFound() {
         // Given
-        String unknownMovieTitle = "test";
+        String unknownMovieTitle = "notTitle";
 
         Mockito.when(movieRepository.findByTitle(unknownMovieTitle))
                 .thenReturn(Optional.empty());
 
         // When
         Assertions.assertThrows(NoSuchElementException.class,
-                () -> movieService.updateMovie(unknownMovieTitle, movie.getGenre(), movie.getMinutes()));
+                () -> movieService.updateMovie(unknownMovieTitle, "notGenre", 0));
 
         // Then
         Mockito.verify(movieRepository).findByTitle(unknownMovieTitle);
@@ -90,47 +77,31 @@ public class MovieServiceImplTest {
     }
 
     @Test
-    public void testDeleteMovieShouldDeleteMovie() {
+    public void testDeleteMovieShouldCallMovieRepository() {
         // When
-        movieService.deleteMovie(movie.getTitle());
+        String title = "Sátántangó";
+
+        movieService.deleteMovie(title);
 
         // Then
-        Mockito.verify(movieRepository).deleteByTitle(movie.getTitle());
+        Mockito.verify(movieRepository).deleteByTitle(title);
         Mockito.verifyNoMoreInteractions(movieRepository);
     }
 
     @Test
-    public void testGetMovieDtoShouldReturnExpectedWhenTheMovieListNotContainsMovies() {
+    public void testGetMovieDtoShouldReturnExpectedResultWhenTheMovieListContainsMovies() {
         // Given
-        MovieDto expected = new MovieDto();
-        expected.setMovieList(Collections.emptyList());
-
-        Mockito.when(movieRepository.findAll())
-                .thenReturn(Collections.emptyList());
-
-        // When
-        MovieDto actual = movieService.getMovieDto();
-
-        // Then
-        Assertions.assertEquals(expected.toString(), actual.toString());
-        Mockito.verify(movieRepository).findAll();
-        Mockito.verifyNoMoreInteractions(movieRepository);
-    }
-
-    @Test
-    public void testGetMovieDtoShouldReturnExpectedWhenTheMovieListContainsMovies() {
-        // Given
-        MovieDto expected = new MovieDto();
-        expected.setMovieList(List.of(movie));
+        Movie movie = new Movie(null, "Sátántangó", "thriller", 450);
+        MovieList expected = new MovieList(List.of(movie));
 
         Mockito.when(movieRepository.findAll())
                 .thenReturn(List.of(movie));
 
         // When
-        MovieDto actual = movieService.getMovieDto();
+        MovieList actual = movieService.getMovieList();
 
         // Then
-        Assertions.assertEquals(expected.toString(), actual.toString());
+        Assertions.assertEquals(expected, actual);
         Mockito.verify(movieRepository).findAll();
         Mockito.verifyNoMoreInteractions(movieRepository);
     }

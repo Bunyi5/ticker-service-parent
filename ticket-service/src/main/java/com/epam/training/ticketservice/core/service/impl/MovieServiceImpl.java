@@ -3,7 +3,7 @@ package com.epam.training.ticketservice.core.service.impl;
 import com.epam.training.ticketservice.core.persistence.MovieRepository;
 import com.epam.training.ticketservice.core.persistence.entity.Movie;
 import com.epam.training.ticketservice.core.service.MovieService;
-import com.epam.training.ticketservice.core.service.model.MovieDto;
+import com.epam.training.ticketservice.ui.command.model.MovieList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,7 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public void createMovie(String title, String genre, int minutes) {
-        Movie movie = new Movie(title, genre, minutes);
+        Movie movie = new Movie(null, title, genre, minutes);
         movieRepository.save(movie);
     }
 
@@ -42,9 +42,7 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public MovieDto getMovieDto() {
-        MovieDto movieDto = new MovieDto();
-        movieDto.setMovieList(movieRepository.findAll());
-        return movieDto;
+    public MovieList getMovieList() {
+        return new MovieList(movieRepository.findAll());
     }
 }

@@ -3,7 +3,7 @@ package com.epam.training.ticketservice.ui.command;
 import com.epam.training.ticketservice.core.persistence.entity.Movie;
 import com.epam.training.ticketservice.core.service.AvailabilityService;
 import com.epam.training.ticketservice.core.service.MovieService;
-import com.epam.training.ticketservice.core.service.model.MovieDto;
+import com.epam.training.ticketservice.ui.command.model.MovieList;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,69 +25,74 @@ public class MovieCommandTest {
     @Mock
     private AvailabilityService availabilityService;
 
-    private Movie movie;
-
     @BeforeEach
     public void init() {
         movieCommand = new MovieCommand(movieService, availabilityService);
-
-        movie = new Movie();
-        movie.setId(10L);
-        movie.setTitle("Sátántangó");
-        movie.setGenre("drama");
-        movie.setMinutes(450);
     }
 
     @Test
-    public void testCreateMovie() {
-        // When
-        movieCommand.createMovie(movie.getTitle(), movie.getGenre(), movie.getMinutes());
-
-        // Then
-        Mockito.verify(movieService).createMovie(movie.getTitle(), movie.getGenre(), movie.getMinutes());
-        Mockito.verifyNoMoreInteractions(movieService);
-    }
-
-    @Test
-    public void testUpdateMovie() {
-        // When
-        movieCommand.updateMovie(movie.getTitle(), movie.getGenre(), movie.getMinutes());
-
-        // Then
-        Mockito.verify(movieService).updateMovie(movie.getTitle(), movie.getGenre(), movie.getMinutes());
-        Mockito.verifyNoMoreInteractions(movieService);
-    }
-
-    @Test
-    public void testDeleteMovie() {
-        // When
-        movieCommand.deleteMovie(movie.getTitle());
-
-        // Then
-        Mockito.verify(movieService).deleteMovie(movie.getTitle());
-        Mockito.verifyNoMoreInteractions(movieService);
-    }
-
-    @Test
-    public void testListMoviesShouldReturnsExpected() {
+    public void testCreateMovieShouldCallMovieServiceWithTheRightParameters() {
         // Given
-        MovieDto expected = new MovieDto();
-        expected.setMovieList(List.of(movie));
+        String title = "Sátántangó";
+        String genre = "drama";
+        int minutes = 450;
 
-        Mockito.when(movieService.getMovieDto())
+        // When
+        movieCommand.createMovie(title, genre, minutes);
+
+        // Then
+        Mockito.verify(movieService).createMovie(title, genre, minutes);
+        Mockito.verifyNoMoreInteractions(movieService);
+    }
+
+    @Test
+    public void testUpdateMovieShouldCallMovieServiceWithTheRightParameters() {
+        // Given
+        String title = "Sátántangó";
+        String genre = "drama";
+        int minutes = 450;
+
+        // When
+        movieCommand.updateMovie(title, genre, minutes);
+
+        // Then
+        Mockito.verify(movieService).updateMovie(title, genre, minutes);
+        Mockito.verifyNoMoreInteractions(movieService);
+    }
+
+    @Test
+    public void testDeleteMovieShouldCallMovieServiceWithTheRightParameters() {
+        // Given
+        String title = "Sátántangó";
+
+        // When
+        movieCommand.deleteMovie(title);
+
+        // Then
+        Mockito.verify(movieService).deleteMovie(title);
+        Mockito.verifyNoMoreInteractions(movieService);
+    }
+
+    @Test
+    public void testListMoviesShouldReturnExpectedResult() {
+        // Given
+        Movie movie = new Movie(null, "Sátántangó", "drama", 450);
+        MovieList expected = new MovieList(List.of(movie));
+
+        Mockito.when(movieService.getMovieList())
                 .thenReturn(expected);
 
         // When
-        MovieDto actual = movieCommand.listMovies();
+        MovieList actual = movieCommand.listMovies();
 
         // Then
         Assertions.assertEquals(expected, actual);
-        Mockito.verify(movieService).getMovieDto();
+        Mockito.verify(movieService).getMovieList();
         Mockito.verifyNoMoreInteractions(movieService);
     }
 
     @Test
-    public void testIsSignedInAccountAdminShouldReturnsExpected() {
+    public void testIsSignedInAccountAdminShouldReturnExpected() {
         // Given
         Availability expected = Availability.available();
 
