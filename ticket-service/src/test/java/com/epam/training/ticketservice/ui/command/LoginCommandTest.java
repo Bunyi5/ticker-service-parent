@@ -2,7 +2,7 @@ package com.epam.training.ticketservice.ui.command;
 
 import com.epam.training.ticketservice.core.persistence.entity.Account;
 import com.epam.training.ticketservice.core.service.AvailabilityService;
-import com.epam.training.ticketservice.core.service.impl.LoginServiceImpl;
+import com.epam.training.ticketservice.core.service.LoginService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ public class LoginCommandTest {
     private LoginCommand loginCommand;
 
     @Mock
-    private LoginServiceImpl loginService;
+    private LoginService loginService;
     @Mock
     private AvailabilityService availabilityService;
 

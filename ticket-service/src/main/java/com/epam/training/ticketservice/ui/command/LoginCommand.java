@@ -1,7 +1,7 @@
 package com.epam.training.ticketservice.ui.command;
 
 import com.epam.training.ticketservice.core.service.AvailabilityService;
-import com.epam.training.ticketservice.core.service.impl.LoginServiceImpl;
+import com.epam.training.ticketservice.core.service.LoginService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.shell.Availability;
@@ -14,7 +14,7 @@ import org.springframework.shell.standard.ShellOption;
 @RequiredArgsConstructor
 public class LoginCommand {
 
-    private final LoginServiceImpl loginService;
+    private final LoginService loginService;
     private final AvailabilityService availabilityService;
 
     @ShellMethod(value = "Sign in privileged", key = "sign in privileged")
