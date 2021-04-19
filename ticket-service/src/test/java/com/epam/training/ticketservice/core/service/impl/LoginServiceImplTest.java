@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -28,42 +29,26 @@ public class LoginServiceImplTest {
     @Mock
     private AuthenticationService authenticationService;
 
-    private Account adminAccount;
-    private AccountDetails adminAccountDetails;
-
-    private Account userAccount;
-
     @BeforeEach
     public void init() {
         loginService = new LoginServiceImpl(passwordEncoder, userDetailsService, authenticationService);
-
-        adminAccount = new Account();
-        adminAccount.setId(200L);
-        adminAccount.setUsername("admin");
-        adminAccount.setPassword("$2y$04$LAI2hWUb1WB7hlnSfHCAEuqkybgnr7RKLJrBIi5m4gp6OOUEwCvmi");
-        adminAccount.setAdmin(true);
-
-        adminAccountDetails = new AccountDetails(adminAccount);
-
-        userAccount = new Account(100L, "test",
-                "$2y$04$4xBBVeTKzpGQfnSnaY7CB.rYzcOAcX62f3mjNqKmlE/29sCx0x5wC", false);
     }
 
     @Test
-    public void testSignInPrivilegedShouldSignInWhenTheRightAdminCredentialsUsed() {
+    public void testSignInPrivilegedShouldCallServicesWithTheRightParameters() {
         // Given
-        String username = "admin";
         String password = "admin";
+        Account adminAccount = new Account(200L, "admin",
+                "$2y$04$LAI2hWUb1WB7hlnSfHCAEuqkybgnr7RKLJrBIi5m4gp6OOUEwCvmi", true);
+        UserDetails adminAccountDetails = new AccountDetails(adminAccount);
 
-        Mockito.when(userDetailsService
-                .loadUserByUsername(adminAccount.getUsername()))
+        Mockito.when(userDetailsService.loadUserByUsername(adminAccount.getUsername()))
                 .thenReturn(adminAccountDetails);
-        Mockito.when(passwordEncoder
-                .matches(password, adminAccount.getPassword()))
+        Mockito.when(passwordEncoder.matches(password, adminAccount.getPassword()))
                 .thenReturn(true);
 
         // When
-        loginService.signInPrivileged(username, password);
+        loginService.signInPrivileged(adminAccount.getUsername(), password);
 
         // Then
         Mockito.verify(userDetailsService).loadUserByUsername(adminAccount.getUsername());
@@ -75,19 +60,19 @@ public class LoginServiceImplTest {
     @Test
     public void testSignInPrivilegedShouldThrowExceptionWhenAdminUsesWrongPassword() {
         // Given
-        String username = "admin";
         String wrongPassword = "notAdmin";
+        Account adminAccount = new Account(200L, "admin",
+                "$2y$04$LAI2hWUb1WB7hlnSfHCAEuqkybgnr7RKLJrBIi5m4gp6OOUEwCvmi", true);
+        UserDetails adminAccountDetails = new AccountDetails(adminAccount);
 
-        Mockito.when(userDetailsService
-                .loadUserByUsername(adminAccount.getUsername()))
+        Mockito.when(userDetailsService.loadUserByUsername(adminAccount.getUsername()))
                 .thenReturn(adminAccountDetails);
-        Mockito.when(passwordEncoder
-                .matches(wrongPassword, adminAccount.getPassword()))
+        Mockito.when(passwordEncoder.matches(wrongPassword, adminAccount.getPassword()))
                 .thenReturn(false);
 
         // When
         Assertions.assertThrows(BadCredentialsException.class,
-                () -> loginService.signInPrivileged(username, wrongPassword));
+                () -> loginService.signInPrivileged(adminAccount.getUsername(), wrongPassword));
 
         // Then
         Mockito.verify(userDetailsService).loadUserByUsername(adminAccount.getUsername());
@@ -96,7 +81,7 @@ public class LoginServiceImplTest {
     }
 
     @Test
-    public void testSignOutShouldSignOutTheAccount() {
+    public void testSignOutShouldCallAuthenticationService() {
         // When
         loginService.signOut();
 
@@ -106,11 +91,15 @@ public class LoginServiceImplTest {
     }
 
     @Test
-    public void testDescribeAccountShouldReturnsExpectedResultWhenAdminIsSignedIn() {
+    public void testDescribeAccountShouldReturnExpectedResultWhenAdminIsSignedIn() {
         // Given
+        Account adminAccount = new Account(200L, "admin",
+                "$2y$04$LAI2hWUb1WB7hlnSfHCAEuqkybgnr7RKLJrBIi5m4gp6OOUEwCvmi", true);
+
         String expected = "Signed in with privileged account '" + adminAccount.getUsername() + "'";
 
-        Mockito.when(authenticationService.getSignedInAccount()).thenReturn(adminAccount);
+        Mockito.when(authenticationService.getSignedInAccount())
+                .thenReturn(adminAccount);
 
         // When
         String actual = loginService.describeAccount();
@@ -122,11 +111,15 @@ public class LoginServiceImplTest {
     }
 
     @Test
-    public void testDescribeAccountShouldReturnsExpectedResultWhenUserIsSignedIn() {
+    public void testDescribeAccountShouldReturnExpectedResultWhenUserIsSignedIn() {
         // Given
+        Account userAccount = new Account(100L, "test",
+                "$2y$04$4xBBVeTKzpGQfnSnaY7CB.rYzcOAcX62f3mjNqKmlE/29sCx0x5wC", false);
+
         String expected = "Signed in with account '" + userAccount.getUsername() + "'";
 
-        Mockito.when(authenticationService.getSignedInAccount()).thenReturn(userAccount);
+        Mockito.when(authenticationService.getSignedInAccount())
+                .thenReturn(userAccount);
 
         // When
         String actual = loginService.describeAccount();

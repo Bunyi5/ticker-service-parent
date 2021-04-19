@@ -24,35 +24,27 @@ public class UserDetailsServiceImplTest {
     @Mock
     private AccountRepository accountRepository;
 
-    private Account adminAccount;
-
     @BeforeEach
     public void init() {
         userDetailsService = new UserDetailsServiceImpl(accountRepository);
-
-        adminAccount = new Account();
-        adminAccount.setId(200L);
-        adminAccount.setUsername("admin");
-        adminAccount.setPassword("$2y$04$LAI2hWUb1WB7hlnSfHCAEuqkybgnr7RKLJrBIi5m4gp6OOUEwCvmi");
-        adminAccount.setAdmin(true);
     }
 
     @Test
-    public void testLoadUserByUsernameShouldReturnsExpectedResultWhenLoadsAdmin() {
+    public void testLoadUserByUsernameShouldReturnExpectedResultWhenLoadsAdmin() {
         // Given
-        String username = "admin";
-        UserDetails expected = new AccountDetails(adminAccount);
+        Account adminAccount = new Account(200L, "admin",
+                "$2y$04$LAI2hWUb1WB7hlnSfHCAEuqkybgnr7RKLJrBIi5m4gp6OOUEwCvmi", true);
+        UserDetails adminAccountDetails = new AccountDetails(adminAccount);
 
-        Mockito.when(accountRepository
-                .findByUsername(username))
+        Mockito.when(accountRepository.findByUsername(adminAccount.getUsername()))
                 .thenReturn(Optional.of(adminAccount));
 
         // When
-        UserDetails actual = userDetailsService.loadUserByUsername(username);
+        UserDetails actual = userDetailsService.loadUserByUsername(adminAccount.getUsername());
 
         // Then
-        Assertions.assertEquals(expected, actual);
-        Mockito.verify(accountRepository).findByUsername(username);
+        Assertions.assertEquals(adminAccountDetails, actual);
+        Mockito.verify(accountRepository).findByUsername(adminAccount.getUsername());
         Mockito.verifyNoMoreInteractions(accountRepository);
     }
 

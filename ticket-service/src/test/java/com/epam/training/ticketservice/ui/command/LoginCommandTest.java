@@ -1,6 +1,5 @@
 package com.epam.training.ticketservice.ui.command;
 
-import com.epam.training.ticketservice.core.persistence.entity.Account;
 import com.epam.training.ticketservice.core.service.AvailabilityService;
 import com.epam.training.ticketservice.core.service.LoginService;
 import org.junit.jupiter.api.Assertions;
@@ -23,49 +22,48 @@ public class LoginCommandTest {
     @Mock
     private AvailabilityService availabilityService;
 
-    private Account adminAccount;
-
     @BeforeEach
     public void init() {
         loginCommand = new LoginCommand(loginService, availabilityService);
-
-        adminAccount = new Account();
-        adminAccount.setId(200L);
-        adminAccount.setUsername("admin");
-        adminAccount.setPassword("admin");
     }
 
     @Test
-    public void testSignInPrivilegedShouldReturnsExpectedWhenTheRightCredentialsAreUsed() {
+    public void testSignInPrivilegedShouldReturnNullWhenTheRightCredentialsAreUsed() {
+        // Given
+        String adminUsername = "admin";
+        String adminPassword = "admin";
+
         // When
-        String actual = loginCommand.signInPrivileged(adminAccount.getUsername(), adminAccount.getPassword());
+        String actual = loginCommand.signInPrivileged(adminUsername, adminPassword);
 
         // Then
         Assertions.assertNull(actual);
-        Mockito.verify(loginService).signInPrivileged(adminAccount.getUsername(), adminAccount.getPassword());
+        Mockito.verify(loginService).signInPrivileged(adminUsername, adminPassword);
         Mockito.verifyNoMoreInteractions(loginService);
     }
 
     @Test
-    public void testSignInPrivilegedShouldReturnsExpectedWhenTheWrongCredentialsAreUsed() {
+    public void testSignInPrivilegedShouldReturnExpectedResultWhenTheWrongCredentialsAreUsed() {
         // Given
+        String adminUsername = "admin";
         String wrongPassword = "notAdmin";
+
         String expected = "Login failed due to incorrect credentials";
 
         Mockito.doThrow(BadCredentialsException.class).when(loginService)
-                .signInPrivileged(adminAccount.getUsername(), wrongPassword);
+                .signInPrivileged(adminUsername, wrongPassword);
 
         // When
-        String actual = loginCommand.signInPrivileged(adminAccount.getUsername(), wrongPassword);
+        String actual = loginCommand.signInPrivileged(adminUsername, wrongPassword);
 
         // Then
         Assertions.assertEquals(expected, actual);
-        Mockito.verify(loginService).signInPrivileged(adminAccount.getUsername(), wrongPassword);
+        Mockito.verify(loginService).signInPrivileged(adminUsername, wrongPassword);
         Mockito.verifyNoMoreInteractions(loginService);
     }
 
     @Test
-    public void testSignOut() {
+    public void testSignOutShouldCallLoginService() {
         // When
         loginCommand.signOut();
 
@@ -75,9 +73,9 @@ public class LoginCommandTest {
     }
 
     @Test
-    public void testDescribeAccountShouldReturnsExpected() {
+    public void testDescribeAccountShouldReturnExpected() {
         // Given
-        String expected = "Signed in with privileged account '" + adminAccount.getUsername() + "'";
+        String expected = "Signed in with privileged account 'admin'";
 
         Mockito.when(loginService.describeAccount())
                 .thenReturn(expected);
@@ -92,7 +90,7 @@ public class LoginCommandTest {
     }
 
     @Test
-    public void testIsThereASignedInAccountShouldReturnsExpected() {
+    public void testIsThereASignedInAccountShouldReturnExpected() {
         // Given
         Availability expected = Availability.available();
 
