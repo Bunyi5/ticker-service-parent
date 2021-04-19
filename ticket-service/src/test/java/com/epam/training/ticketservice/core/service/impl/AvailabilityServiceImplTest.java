@@ -59,4 +59,38 @@ public class AvailabilityServiceImplTest {
         Mockito.verify(authenticationService).getSignedInAccount();
         Mockito.verifyNoMoreInteractions(authenticationService);
     }
+
+    @Test
+    public void testIsSignedInAccountAdminShouldReturnAvailable() {
+        // Given
+        Availability expected = Availability.available();
+
+        Mockito.when(authenticationService.isSignedInAccountAdmin())
+                .thenReturn(true);
+
+        // When
+        Availability actual = availabilityService.isSignedInAccountAdmin();
+
+        // Then
+        Assertions.assertEquals(expected.isAvailable(), actual.isAvailable());
+        Mockito.verify(authenticationService).isSignedInAccountAdmin();
+        Mockito.verifyNoMoreInteractions(authenticationService);
+    }
+
+    @Test
+    public void testIsSignedInAccountAdminShouldReturnUnAvailable() {
+        // Given
+        Availability expected = Availability.unavailable("You are not an admin");
+
+        Mockito.when(authenticationService.isSignedInAccountAdmin())
+                .thenReturn(false);
+
+        // When
+        Availability actual = availabilityService.isSignedInAccountAdmin();
+
+        // Then
+        Assertions.assertEquals(expected.isAvailable(), actual.isAvailable());
+        Mockito.verify(authenticationService).isSignedInAccountAdmin();
+        Mockito.verifyNoMoreInteractions(authenticationService);
+    }
 }

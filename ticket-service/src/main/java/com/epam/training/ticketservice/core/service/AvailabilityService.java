@@ -5,4 +5,6 @@ import org.springframework.shell.Availability;
 public interface AvailabilityService {
 
     Availability isThereASignedInAccount();
+
+    Availability isSignedInAccountAdmin();
 }
