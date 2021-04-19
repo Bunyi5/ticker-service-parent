@@ -41,11 +41,12 @@ public class LoginServiceImplTest {
         adminAccount.setId(200L);
         adminAccount.setUsername("admin");
         adminAccount.setPassword("$2y$04$LAI2hWUb1WB7hlnSfHCAEuqkybgnr7RKLJrBIi5m4gp6OOUEwCvmi");
+        adminAccount.setAdmin(true);
 
         adminAccountDetails = new AccountDetails(adminAccount);
 
         userAccount = new Account(100L, "test",
-                "$2y$04$4xBBVeTKzpGQfnSnaY7CB.rYzcOAcX62f3mjNqKmlE/29sCx0x5wC");
+                "$2y$04$4xBBVeTKzpGQfnSnaY7CB.rYzcOAcX62f3mjNqKmlE/29sCx0x5wC", false);
     }
 
     @Test

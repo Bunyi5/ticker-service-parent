@@ -34,6 +34,7 @@ public class UserDetailsServiceImplTest {
         adminAccount.setId(200L);
         adminAccount.setUsername("admin");
         adminAccount.setPassword("$2y$04$LAI2hWUb1WB7hlnSfHCAEuqkybgnr7RKLJrBIi5m4gp6OOUEwCvmi");
+        adminAccount.setAdmin(true);
     }
 
     @Test

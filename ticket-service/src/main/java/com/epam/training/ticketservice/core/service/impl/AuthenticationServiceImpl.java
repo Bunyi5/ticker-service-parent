@@ -42,7 +42,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public boolean isSignedInAccountAdmin() {
         try {
             Account account = getSignedInAccount();
-            return account.isAccountAdmin();
+            return account.isAdmin();
         } catch (AuthenticationCredentialsNotFoundException e) {
             return false;
         }

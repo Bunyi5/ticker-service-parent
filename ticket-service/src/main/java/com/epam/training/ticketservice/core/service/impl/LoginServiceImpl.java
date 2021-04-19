@@ -40,7 +40,7 @@ public class LoginServiceImpl implements LoginService {
         try {
             Account account = authenticationService.getSignedInAccount();
 
-            if (account.isAccountAdmin()) {
+            if (account.isAdmin()) {
                 return "Signed in with privileged account '" + account.getUsername() + "'";
             } else {
                 return "Signed in with account '" + account.getUsername() + "'";
