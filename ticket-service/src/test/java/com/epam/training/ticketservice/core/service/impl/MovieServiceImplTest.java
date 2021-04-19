@@ -8,10 +8,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -23,6 +26,8 @@ public class MovieServiceImplTest {
 
     @Mock
     private MovieRepository movieRepository;
+    @Captor
+    private ArgumentCaptor<Movie> movieCaptor;
 
     private Movie movie;
 
@@ -31,6 +36,7 @@ public class MovieServiceImplTest {
         movieService = new MovieServiceImpl(movieRepository);
 
         movie = new Movie();
+        movie.setId(10L);
         movie.setTitle("Sátántangó");
         movie.setGenre("drama");
         movie.setMinutes(450);
@@ -42,8 +48,9 @@ public class MovieServiceImplTest {
         movieService.createMovie(movie.getTitle(), movie.getGenre(), movie.getMinutes());
 
         // Then
-        Mockito.verify(movieRepository).save(movie);
+        Mockito.verify(movieRepository).save(movieCaptor.capture());
         Mockito.verifyNoMoreInteractions(movieRepository);
+        Assertions.assertEquals(movie.toString(), movieCaptor.getValue().toString());
     }
 
     @Test
@@ -60,8 +67,9 @@ public class MovieServiceImplTest {
 
         // Then
         Mockito.verify(movieRepository).findByTitle(movie.getTitle());
-        Mockito.verify(movieRepository).save(expected);
+        Mockito.verify(movieRepository).save(movieCaptor.capture());
         Mockito.verifyNoMoreInteractions(movieRepository);
+        Assertions.assertEquals(expected.toString(), movieCaptor.getValue().toString());
     }
 
     @Test
@@ -92,7 +100,25 @@ public class MovieServiceImplTest {
     }
 
     @Test
-    public void testGetMovieDtoShouldReturnExpected() {
+    public void testGetMovieDtoShouldReturnExpectedWhenTheMovieListNotContainsMovies() {
+        // Given
+        MovieDto expected = new MovieDto();
+        expected.setMovieList(Collections.emptyList());
+
+        Mockito.when(movieRepository.findAll())
+                .thenReturn(Collections.emptyList());
+
+        // When
+        MovieDto actual = movieService.getMovieDto();
+
+        // Then
+        Assertions.assertEquals(expected.toString(), actual.toString());
+        Mockito.verify(movieRepository).findAll();
+        Mockito.verifyNoMoreInteractions(movieRepository);
+    }
+
+    @Test
+    public void testGetMovieDtoShouldReturnExpectedWhenTheMovieListContainsMovies() {
         // Given
         MovieDto expected = new MovieDto();
         expected.setMovieList(List.of(movie));
@@ -104,7 +130,7 @@ public class MovieServiceImplTest {
         MovieDto actual = movieService.getMovieDto();
 
         // Then
-        Assertions.assertEquals(expected, actual);
+        Assertions.assertEquals(expected.toString(), actual.toString());
         Mockito.verify(movieRepository).findAll();
         Mockito.verifyNoMoreInteractions(movieRepository);
     }

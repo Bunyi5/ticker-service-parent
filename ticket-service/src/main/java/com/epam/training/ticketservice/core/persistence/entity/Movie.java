@@ -1,6 +1,5 @@
 package com.epam.training.ticketservice.core.persistence.entity;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,7 +14,6 @@ import javax.persistence.Id;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode
 public class Movie {
 
     @Id

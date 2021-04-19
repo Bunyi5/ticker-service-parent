@@ -1,7 +1,6 @@
 package com.epam.training.ticketservice.core.service.model;
 
 import com.epam.training.ticketservice.core.persistence.entity.Movie;
-import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
 import java.util.List;
@@ -9,7 +8,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Setter
-@EqualsAndHashCode
 public class MovieDto {
 
     List<Movie> movieList;
