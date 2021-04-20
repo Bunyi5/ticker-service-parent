@@ -3,7 +3,8 @@ package com.epam.training.ticketservice.core.service.impl;
 import com.epam.training.ticketservice.core.persistence.MovieRepository;
 import com.epam.training.ticketservice.core.persistence.entity.Movie;
 import com.epam.training.ticketservice.core.service.MovieService;
-import com.epam.training.ticketservice.ui.command.model.MovieList;
+import com.epam.training.ticketservice.core.service.model.MovieDto;
+import com.epam.training.ticketservice.ui.command.model.MovieDtoList;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,62 +25,138 @@ public class MovieServiceImplTest {
     @Mock
     private MovieRepository movieRepository;
 
+    private static final String TITLE = "Sátántangó";
+    private static final String GENRE = "drama";
+    private static final int MINUTES = 450;
+    private static final MovieDto MOVIE_DTO = MovieDto.builder()
+            .title(TITLE)
+            .genre(GENRE)
+            .minutes(MINUTES)
+            .build();
+    private static final Movie MOVIE_ENTITY = new Movie(null, TITLE, GENRE, MINUTES);
+
     @BeforeEach
     public void init() {
         movieService = new MovieServiceImpl(movieRepository);
     }
 
     @Test
-    public void testCreateMovieShouldCallMovieRepositoryWithTheRightParameters() {
+    public void testCreateMovieShouldCallMovieRepositoryWhenTheInputMovieIsValid() {
         // Given
-        Movie expected = new Movie(null, "Sátántangó", "drama", 450);
+        Mockito.when(movieRepository.save(MOVIE_ENTITY))
+                .thenReturn(MOVIE_ENTITY);
 
         // When
-        movieService.createMovie(expected.getTitle(), expected.getGenre(), expected.getMinutes());
+        movieService.createMovie(MOVIE_DTO);
 
         // Then
-        Mockito.verify(movieRepository).save(expected);
+        Mockito.verify(movieRepository).save(MOVIE_ENTITY);
         Mockito.verifyNoMoreInteractions(movieRepository);
     }
 
     @Test
-    public void testUpdateMovieShouldCallMovieRepositoryWithTheRightParameters() {
-        // Given
-        Movie expected = new Movie(null, "Sátántangó", "thriller", 450);
-
-        Mockito.when(movieRepository.findByTitle(expected.getTitle()))
-                .thenReturn(Optional.of(new Movie()));
-
+    public void testCreateMovieShouldThrowNullPointerExceptionWhenTheMovieIsNull() {
         // When
-        movieService.updateMovie(expected.getTitle(), expected.getGenre(), expected.getMinutes());
+        Assertions.assertThrows(NullPointerException.class,
+                () -> movieService.createMovie(null));
 
         // Then
-        Mockito.verify(movieRepository).findByTitle(expected.getTitle());
-        Mockito.verify(movieRepository).save(expected);
+        Mockito.verifyNoMoreInteractions(movieRepository);
+    }
+
+    @Test
+    public void testCreateMovieShouldThrowNullPointerExceptionWhenTheMovieTitleIsNull() {
+        // Given
+        MovieDto movieDto = MovieDto.builder()
+                .title(null)
+                .genre(MOVIE_DTO.getGenre())
+                .minutes(MOVIE_DTO.getMinutes())
+                .build();
+
+        // When
+        Assertions.assertThrows(NullPointerException.class,
+                () -> movieService.createMovie(movieDto));
+
+        // Then
+        Mockito.verifyNoMoreInteractions(movieRepository);
+    }
+
+    @Test
+    public void testCreateMovieShouldThrowNullPointerExceptionWhenTheMovieGenreIsNull() {
+        // Given
+        MovieDto movieDto = MovieDto.builder()
+                .title(MOVIE_DTO.getTitle())
+                .genre(null)
+                .minutes(MOVIE_DTO.getMinutes())
+                .build();
+
+        // When
+        Assertions.assertThrows(NullPointerException.class,
+                () -> movieService.createMovie(movieDto));
+
+        // Then
+        Mockito.verifyNoMoreInteractions(movieRepository);
+    }
+
+    @Test
+    public void testCreateMovieShouldThrowNullPointerExceptionWhenTheMovieMinutesIsZero() {
+        // Given
+        MovieDto movieDto = MovieDto.builder()
+                .title(MOVIE_DTO.getTitle())
+                .genre(MOVIE_DTO.getGenre())
+                .minutes(0)
+                .build();
+
+        // When
+        Assertions.assertThrows(NullPointerException.class,
+                () -> movieService.createMovie(movieDto));
+
+        // Then
+        Mockito.verifyNoMoreInteractions(movieRepository);
+    }
+
+    @Test
+    public void testUpdateMovieShouldCallMovieRepositoryWhenTheInputMovieIsValid() {
+        // Given
+        Mockito.when(movieRepository.findByTitle(MOVIE_ENTITY.getTitle()))
+                .thenReturn(Optional.of(MOVIE_ENTITY));
+
+        // When
+        movieService.updateMovie(MOVIE_DTO);
+
+        // Then
+        Mockito.verify(movieRepository).findByTitle(MOVIE_ENTITY.getTitle());
+        Mockito.verify(movieRepository).save(MOVIE_ENTITY);
         Mockito.verifyNoMoreInteractions(movieRepository);
     }
 
     @Test
     public void testUpdateMovieShouldThrowExceptionWhenMovieNotFound() {
         // Given
-        String unknownMovieTitle = "notTitle";
+        MovieDto movieDto = MovieDto.builder()
+                .title("notTitle")
+                .genre(MOVIE_DTO.getGenre())
+                .minutes(MOVIE_DTO.getMinutes())
+                .build();
 
-        Mockito.when(movieRepository.findByTitle(unknownMovieTitle))
+        Mockito.when(movieRepository.findByTitle(movieDto.getTitle()))
                 .thenReturn(Optional.empty());
 
         // When
         Assertions.assertThrows(NoSuchElementException.class,
-                () -> movieService.updateMovie(unknownMovieTitle, "notGenre", 0));
+                () -> movieService.updateMovie(movieDto));
 
         // Then
-        Mockito.verify(movieRepository).findByTitle(unknownMovieTitle);
+        Mockito.verify(movieRepository).findByTitle(movieDto.getTitle());
         Mockito.verifyNoMoreInteractions(movieRepository);
     }
 
     @Test
-    public void testDeleteMovieShouldCallMovieRepository() {
+    public void testDeleteMovieShouldCallMovieRepositoryWhenTheInputTitleIsValid() {
         // Given
         String title = "Sátántangó";
+
+        Mockito.doNothing().when(movieRepository).deleteByTitle(title);
 
         // When
         movieService.deleteMovie(title);
@@ -92,14 +169,13 @@ public class MovieServiceImplTest {
     @Test
     public void testGetMovieListShouldReturnExpectedResult() {
         // Given
-        Movie movie = new Movie(null, "Sátántangó", "thriller", 450);
-        MovieList expected = new MovieList(List.of(movie));
+        MovieDtoList expected = new MovieDtoList(List.of(MOVIE_DTO));
 
         Mockito.when(movieRepository.findAll())
-                .thenReturn(List.of(movie));
+                .thenReturn(List.of(MOVIE_ENTITY));
 
         // When
-        MovieList actual = movieService.getMovieList();
+        MovieDtoList actual = movieService.getMovieList();
 
         // Then
         Assertions.assertEquals(expected, actual);

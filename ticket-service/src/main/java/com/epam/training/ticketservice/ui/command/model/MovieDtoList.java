@@ -1,6 +1,6 @@
 package com.epam.training.ticketservice.ui.command.model;
 
-import com.epam.training.ticketservice.core.persistence.entity.Movie;
+import com.epam.training.ticketservice.core.service.model.MovieDto;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
@@ -10,16 +10,16 @@ import java.util.stream.Collectors;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public class MovieList {
+public class MovieDtoList {
 
-    private final List<Movie> movieList;
+    private final List<MovieDto> movieDtoList;
 
     @Override
     public String toString() {
-        if (movieList.isEmpty()) {
+        if (movieDtoList.isEmpty()) {
             return "There are no movies at the moment";
         } else {
-            return movieList.stream().map(Objects::toString).collect(Collectors.joining("\n"));
+            return movieDtoList.stream().map(Objects::toString).collect(Collectors.joining("\n"));
         }
     }
 }
