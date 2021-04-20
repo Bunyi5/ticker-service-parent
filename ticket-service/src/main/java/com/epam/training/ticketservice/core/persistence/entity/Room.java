@@ -24,9 +24,4 @@ public class Room {
     private int roomSeat;
     private int roomRow;
     private int roomColumn;
-
-    @Override
-    public String toString() {
-        return "Room " + roomName + " with " + roomSeat + " seats, " + roomRow + " rows and " + roomColumn + " columns";
-    }
 }

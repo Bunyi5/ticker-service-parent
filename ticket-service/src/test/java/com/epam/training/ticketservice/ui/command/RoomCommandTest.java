@@ -1,9 +1,9 @@
 package com.epam.training.ticketservice.ui.command;
 
-import com.epam.training.ticketservice.core.persistence.entity.Room;
 import com.epam.training.ticketservice.core.service.AvailabilityService;
 import com.epam.training.ticketservice.core.service.RoomService;
-import com.epam.training.ticketservice.ui.command.model.RoomList;
+import com.epam.training.ticketservice.core.service.model.RoomDto;
+import com.epam.training.ticketservice.ui.command.model.RoomDtoList;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +25,15 @@ public class RoomCommandTest {
     @Mock
     private AvailabilityService availabilityService;
 
+    private static final String ROOM_NAME = "Pedersoli";
+    private static final int ROOM_ROW = 20;
+    private static final int ROOM_COLUMN = 10;
+    private static final RoomDto ROOM_DTO = RoomDto.builder()
+            .roomName(ROOM_NAME)
+            .roomRow(ROOM_ROW)
+            .roomColumn(ROOM_COLUMN)
+            .build();
+
     @BeforeEach
     public void init() {
         roomCommand = new RoomCommand(roomService, availabilityService);
@@ -33,59 +42,52 @@ public class RoomCommandTest {
     @Test
     public void testCreateRoomShouldCallRoomServiceWithTheRightParameters() {
         // Given
-        String title = "Pedersoli";
-        int row = 20;
-        int column = 10;
+        Mockito.doNothing().when(roomService).createRoom(ROOM_DTO);
 
         // When
-        roomCommand.createRoom(title, row, column);
+        roomCommand.createRoom(ROOM_NAME, ROOM_ROW, ROOM_COLUMN);
 
         // Then
-        Mockito.verify(roomService).createRoom(title, row, column);
+        Mockito.verify(roomService).createRoom(ROOM_DTO);
         Mockito.verifyNoMoreInteractions(roomService);
     }
 
     @Test
     public void testUpdateRoomShouldCallRoomServiceWithTheRightParameters() {
         // Given
-        String title = "Pedersoli";
-        int row = 20;
-        int column = 10;
+        Mockito.doNothing().when(roomService).updateRoom(ROOM_DTO);
 
         // When
-        roomCommand.updateRoom(title, row, column);
+        roomCommand.updateRoom(ROOM_NAME, ROOM_ROW, ROOM_COLUMN);
 
         // Then
-        Mockito.verify(roomService).updateRoom(title, row, column);
+        Mockito.verify(roomService).updateRoom(ROOM_DTO);
         Mockito.verifyNoMoreInteractions(roomService);
     }
 
     @Test
     public void testDeleteRoomShouldCallRoomServiceWithTheRightParameters() {
         // Given
-        String title = "Pedersoli";
+        Mockito.doNothing().when(roomService).deleteRoom(ROOM_NAME);
 
         // When
-        roomCommand.deleteRoom(title);
+        roomCommand.deleteRoom(ROOM_NAME);
 
         // Then
-        Mockito.verify(roomService).deleteRoom(title);
+        Mockito.verify(roomService).deleteRoom(ROOM_NAME);
         Mockito.verifyNoMoreInteractions(roomService);
     }
 
     @Test
     public void testListRoomsShouldReturnExpectedResult() {
         // Given
-        int row = 20;
-        int column = 10;
-        Room room = new Room(null, "Pedersoli", row * column, row, column);
-        RoomList expected = new RoomList(List.of(room));
+        RoomDtoList expected = new RoomDtoList(List.of(ROOM_DTO));
 
         Mockito.when(roomService.getRoomList())
                 .thenReturn(expected);
 
         // When
-        RoomList actual = roomCommand.listRooms();
+        RoomDtoList actual = roomCommand.listRooms();
 
         // Then
         Assertions.assertEquals(expected, actual);

@@ -3,7 +3,8 @@ package com.epam.training.ticketservice.core.service.impl;
 import com.epam.training.ticketservice.core.persistence.RoomRepository;
 import com.epam.training.ticketservice.core.persistence.entity.Room;
 import com.epam.training.ticketservice.core.service.RoomService;
-import com.epam.training.ticketservice.ui.command.model.RoomList;
+import com.epam.training.ticketservice.core.service.model.RoomDto;
+import com.epam.training.ticketservice.ui.command.model.RoomDtoList;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,66 +25,139 @@ public class RoomServiceImplTest {
     @Mock
     private RoomRepository roomRepository;
 
+    private static final String ROOM_NAME = "Pedersoli";
+    private static final int ROOM_ROW = 20;
+    private static final int ROOM_COLUMN = 10;
+    private static final RoomDto ROOM_DTO = RoomDto.builder()
+            .roomName(ROOM_NAME)
+            .roomRow(ROOM_ROW)
+            .roomColumn(ROOM_COLUMN)
+            .build();
+    private static final Room ROOM_ENTITY =
+            new Room(null, ROOM_NAME, ROOM_ROW * ROOM_COLUMN, ROOM_ROW, ROOM_COLUMN);
+
     @BeforeEach
     public void init() {
         roomService = new RoomServiceImpl(roomRepository);
     }
 
     @Test
-    public void testCreateRoomShouldCallRoomRepositoryWithTheRightParameters() {
+    public void testCreateRoomShouldCallRoomRepositoryWhenTheInputRoomIsValid() {
         // Given
-        int row = 20;
-        int column = 10;
-        Room expected = new Room(null, "Pedersoli", row * column, row, column);
+        Mockito.when(roomRepository.save(ROOM_ENTITY))
+                .thenReturn(ROOM_ENTITY);
 
         // When
-        roomService.createRoom(expected.getRoomName(), expected.getRoomRow(), expected.getRoomColumn());
+        roomService.createRoom(ROOM_DTO);
 
         // Then
-        Mockito.verify(roomRepository).save(expected);
+        Mockito.verify(roomRepository).save(ROOM_ENTITY);
         Mockito.verifyNoMoreInteractions(roomRepository);
     }
 
     @Test
-    public void testUpdateRoomShouldCallRoomRepositoryWithTheRightParameters() {
-        // Given
-        int row = 20;
-        int column = 10;
-        Room expected = new Room(null, "Pedersoli", row * column, row, column);
-
-        Mockito.when(roomRepository.findByRoomName(expected.getRoomName()))
-                .thenReturn(Optional.of(new Room()));
-
+    public void testCreateRoomShouldThrowNullPointerExceptionWhenTheRoomIsNull() {
         // When
-        roomService.updateRoom(expected.getRoomName(), expected.getRoomRow(), expected.getRoomColumn());
+        Assertions.assertThrows(NullPointerException.class,
+                () -> roomService.createRoom(null));
 
         // Then
-        Mockito.verify(roomRepository).findByRoomName(expected.getRoomName());
-        Mockito.verify(roomRepository).save(expected);
+        Mockito.verifyNoMoreInteractions(roomRepository);
+    }
+
+    @Test
+    public void testCreateRoomShouldThrowNullPointerExceptionWhenTheRoomNameIsNull() {
+        // Given
+        RoomDto roomDto = RoomDto.builder()
+                .roomName(null)
+                .roomRow(ROOM_DTO.getRoomRow())
+                .roomColumn(ROOM_DTO.getRoomColumn())
+                .build();
+
+        // When
+        Assertions.assertThrows(NullPointerException.class,
+                () -> roomService.createRoom(roomDto));
+
+        // Then
+        Mockito.verifyNoMoreInteractions(roomRepository);
+    }
+
+    @Test
+    public void testCreateRoomShouldThrowNullPointerExceptionWhenTheRoomRowIsZero() {
+        // Given
+        RoomDto roomDto = RoomDto.builder()
+                .roomName(ROOM_DTO.getRoomName())
+                .roomRow(0)
+                .roomColumn(ROOM_DTO.getRoomColumn())
+                .build();
+
+        // When
+        Assertions.assertThrows(NullPointerException.class,
+                () -> roomService.createRoom(roomDto));
+
+        // Then
+        Mockito.verifyNoMoreInteractions(roomRepository);
+    }
+
+    @Test
+    public void testCreateRoomShouldThrowNullPointerExceptionWhenTheRoomColumnIsZero() {
+        // Given
+        RoomDto roomDto = RoomDto.builder()
+                .roomName(ROOM_DTO.getRoomName())
+                .roomRow(ROOM_DTO.getRoomRow())
+                .roomColumn(0)
+                .build();
+
+        // When
+        Assertions.assertThrows(NullPointerException.class,
+                () -> roomService.createRoom(roomDto));
+
+        // Then
+        Mockito.verifyNoMoreInteractions(roomRepository);
+    }
+
+    @Test
+    public void testUpdateRoomShouldCallRoomRepositoryWhenTheInputRoomIsValid() {
+        // Given
+        Mockito.when(roomRepository.findByRoomName(ROOM_ENTITY.getRoomName()))
+                .thenReturn(Optional.of(ROOM_ENTITY));
+
+        // When
+        roomService.updateRoom(ROOM_DTO);
+
+        // Then
+        Mockito.verify(roomRepository).findByRoomName(ROOM_ENTITY.getRoomName());
+        Mockito.verify(roomRepository).save(ROOM_ENTITY);
         Mockito.verifyNoMoreInteractions(roomRepository);
     }
 
     @Test
     public void testUpdateRoomShouldThrowExceptionWhenRoomNotFound() {
         // Given
-        String unknownRoomName = "notRoomName";
+        RoomDto roomDto = RoomDto.builder()
+                .roomName("notRoomName")
+                .roomRow(ROOM_DTO.getRoomRow())
+                .roomColumn(ROOM_DTO.getRoomColumn())
+                .build();
 
-        Mockito.when(roomRepository.findByRoomName(unknownRoomName))
+        Mockito.when(roomRepository.findByRoomName(roomDto.getRoomName()))
                 .thenReturn(Optional.empty());
 
         // When
         Assertions.assertThrows(NoSuchElementException.class,
-                () -> roomService.updateRoom(unknownRoomName, 0, 0));
+                () -> roomService.updateRoom(roomDto));
 
         // Then
-        Mockito.verify(roomRepository).findByRoomName(unknownRoomName);
+        Mockito.verify(roomRepository).findByRoomName(roomDto.getRoomName());
         Mockito.verifyNoMoreInteractions(roomRepository);
     }
 
     @Test
-    public void testDeleteRoomShouldCallRoomRepository() {
+    public void testDeleteRoomShouldCallRoomRepositoryWhenTheInputRoomNameIsValid() {
         // Given
         String roomName = "Pedersoli";
+
+        Mockito.doNothing().when(roomRepository).deleteByRoomName(roomName);
 
         // When
         roomService.deleteRoom(roomName);
@@ -96,16 +170,13 @@ public class RoomServiceImplTest {
     @Test
     public void testGetRoomListShouldReturnExpectedResult() {
         // Given
-        int row = 20;
-        int column = 10;
-        Room room = new Room(null, "Pedersoli", row * column, row, column);
-        RoomList expected = new RoomList(List.of(room));
+        RoomDtoList expected = new RoomDtoList(List.of(ROOM_DTO));
 
         Mockito.when(roomRepository.findAll())
-                .thenReturn(List.of(room));
+                .thenReturn(List.of(ROOM_ENTITY));
 
         // When
-        RoomList actual = roomService.getRoomList();
+        RoomDtoList actual = roomService.getRoomList();
 
         // Then
         Assertions.assertEquals(expected, actual);
