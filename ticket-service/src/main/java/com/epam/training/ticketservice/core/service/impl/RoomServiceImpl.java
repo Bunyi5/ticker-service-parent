@@ -27,12 +27,8 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public void updateRoom(RoomDto roomDto) {
-        Optional<Room> maybeRoom = roomRepository.findByRoomName(roomDto.getRoomName());
-        if (maybeRoom.isEmpty()) {
-            throw new NoSuchElementException("Room not found!");
-        } else {
-            saveRoom(maybeRoom.get().getId(), roomDto);
-        }
+        Room room = getRoomByRoomName(roomDto.getRoomName());
+        saveRoom(room.getId(), roomDto);
     }
 
     @Override
@@ -42,8 +38,15 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public RoomDtoList getRoomList() {
-        return new RoomDtoList(getRoomDtoList());
+    public RoomDtoList getRoomDtoList() {
+        List<RoomDto> roomDtoList = roomRepository.findAll().stream()
+                .map(this::convertEntityToDto).collect(Collectors.toList());
+        return new RoomDtoList(roomDtoList);
+    }
+
+    @Override
+    public RoomDto getRoomDtoByRoomName(String roomName) {
+        return convertEntityToDto(getRoomByRoomName(roomName));
     }
 
     private void saveRoom(Long id, RoomDto roomDto) {
@@ -67,12 +70,19 @@ public class RoomServiceImpl implements RoomService {
         }
     }
 
-    private List<RoomDto> getRoomDtoList() {
-        return roomRepository.findAll().stream().map(this::convertEntityToDto).collect(Collectors.toList());
+    private Room getRoomByRoomName(String roomName) {
+        Optional<Room> optionalRoom = roomRepository.findByRoomName(roomName);
+
+        if (optionalRoom.isEmpty()) {
+            throw new NoSuchElementException("Room not found!");
+        }
+
+        return optionalRoom.get();
     }
 
     private RoomDto convertEntityToDto(Room room) {
         return RoomDto.builder()
+                .id(room.getId())
                 .roomName(room.getRoomName())
                 .roomRow(room.getRoomRow())
                 .roomColumn(room.getRoomColumn())

@@ -11,5 +11,7 @@ public interface RoomService {
 
     void deleteRoom(String name);
 
-    RoomDtoList getRoomList();
+    RoomDtoList getRoomDtoList();
+
+    RoomDto getRoomDtoByRoomName(String roomName);
 }

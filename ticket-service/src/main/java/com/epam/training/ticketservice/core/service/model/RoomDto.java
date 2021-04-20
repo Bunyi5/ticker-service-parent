@@ -10,6 +10,7 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RoomDto {
 
+    private final Long id;
     private final String roomName;
     private final int roomSeat;
     private final int roomRow;
@@ -25,12 +26,18 @@ public class RoomDto {
     }
 
     public static class RoomDtoBuilder {
+        private Long id;
         private String roomName;
         private int roomSeat;
         private int roomRow;
         private int roomColumn;
 
         RoomDtoBuilder() {
+        }
+
+        public RoomDtoBuilder id(Long id) {
+            this.id = id;
+            return this;
         }
 
         public RoomDtoBuilder roomName(String roomName) {
@@ -55,7 +62,7 @@ public class RoomDto {
         }
 
         public RoomDto build() {
-            return new RoomDto(roomName, roomSeat, roomRow, roomColumn);
+            return new RoomDto(id, roomName, roomSeat, roomRow, roomColumn);
         }
 
         public String toString() {
