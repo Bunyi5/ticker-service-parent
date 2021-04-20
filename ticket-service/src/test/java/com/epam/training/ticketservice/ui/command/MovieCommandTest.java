@@ -1,9 +1,9 @@
 package com.epam.training.ticketservice.ui.command;
 
-import com.epam.training.ticketservice.core.persistence.entity.Movie;
 import com.epam.training.ticketservice.core.service.AvailabilityService;
 import com.epam.training.ticketservice.core.service.MovieService;
-import com.epam.training.ticketservice.ui.command.model.MovieList;
+import com.epam.training.ticketservice.core.service.model.MovieDto;
+import com.epam.training.ticketservice.ui.command.model.MovieDtoList;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +25,15 @@ public class MovieCommandTest {
     @Mock
     private AvailabilityService availabilityService;
 
+    private static final String TITLE = "Sátántangó";
+    private static final String GENRE = "drama";
+    private static final int MINUTES = 450;
+    private static final MovieDto MOVIE_DTO = MovieDto.builder()
+            .title(TITLE)
+            .genre(GENRE)
+            .minutes(MINUTES)
+            .build();
+
     @BeforeEach
     public void init() {
         movieCommand = new MovieCommand(movieService, availabilityService);
@@ -33,57 +42,52 @@ public class MovieCommandTest {
     @Test
     public void testCreateMovieShouldCallMovieServiceWithTheRightParameters() {
         // Given
-        String title = "Sátántangó";
-        String genre = "drama";
-        int minutes = 450;
+        Mockito.doNothing().when(movieService).createMovie(MOVIE_DTO);
 
         // When
-        movieCommand.createMovie(title, genre, minutes);
+        movieCommand.createMovie(TITLE, GENRE, MINUTES);
 
         // Then
-        Mockito.verify(movieService).createMovie(title, genre, minutes);
+        Mockito.verify(movieService).createMovie(MOVIE_DTO);
         Mockito.verifyNoMoreInteractions(movieService);
     }
 
     @Test
     public void testUpdateMovieShouldCallMovieServiceWithTheRightParameters() {
         // Given
-        String title = "Sátántangó";
-        String genre = "drama";
-        int minutes = 450;
+        Mockito.doNothing().when(movieService).updateMovie(MOVIE_DTO);
 
         // When
-        movieCommand.updateMovie(title, genre, minutes);
+        movieCommand.updateMovie(TITLE, GENRE, MINUTES);
 
         // Then
-        Mockito.verify(movieService).updateMovie(title, genre, minutes);
+        Mockito.verify(movieService).updateMovie(MOVIE_DTO);
         Mockito.verifyNoMoreInteractions(movieService);
     }
 
     @Test
     public void testDeleteMovieShouldCallMovieServiceWithTheRightParameters() {
         // Given
-        String title = "Sátántangó";
+        Mockito.doNothing().when(movieService).deleteMovie(TITLE);
 
         // When
-        movieCommand.deleteMovie(title);
+        movieCommand.deleteMovie(TITLE);
 
         // Then
-        Mockito.verify(movieService).deleteMovie(title);
+        Mockito.verify(movieService).deleteMovie(TITLE);
         Mockito.verifyNoMoreInteractions(movieService);
     }
 
     @Test
     public void testListMoviesShouldReturnExpectedResult() {
         // Given
-        Movie movie = new Movie(null, "Sátántangó", "drama", 450);
-        MovieList expected = new MovieList(List.of(movie));
+        MovieDtoList expected = new MovieDtoList(List.of(MOVIE_DTO));
 
         Mockito.when(movieService.getMovieList())
                 .thenReturn(expected);
 
         // When
-        MovieList actual = movieCommand.listMovies();
+        MovieDtoList actual = movieCommand.listMovies();
 
         // Then
         Assertions.assertEquals(expected, actual);

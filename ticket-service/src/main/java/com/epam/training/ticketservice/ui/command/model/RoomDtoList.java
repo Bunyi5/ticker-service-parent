@@ -1,6 +1,6 @@
 package com.epam.training.ticketservice.ui.command.model;
 
-import com.epam.training.ticketservice.core.persistence.entity.Room;
+import com.epam.training.ticketservice.core.service.model.RoomDto;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
@@ -10,16 +10,16 @@ import java.util.stream.Collectors;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public class RoomList {
+public class RoomDtoList {
 
-    private final List<Room> roomList;
+    private final List<RoomDto> roomDtoList;
 
     @Override
     public String toString() {
-        if (roomList.isEmpty()) {
+        if (roomDtoList.isEmpty()) {
             return "There are no rooms at the moment";
         } else {
-            return roomList.stream().map(Objects::toString).collect(Collectors.joining("\n"));
+            return roomDtoList.stream().map(Objects::toString).collect(Collectors.joining("\n"));
         }
     }
 }

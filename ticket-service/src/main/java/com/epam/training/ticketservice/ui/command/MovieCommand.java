@@ -2,7 +2,8 @@ package com.epam.training.ticketservice.ui.command;
 
 import com.epam.training.ticketservice.core.service.AvailabilityService;
 import com.epam.training.ticketservice.core.service.MovieService;
-import com.epam.training.ticketservice.ui.command.model.MovieList;
+import com.epam.training.ticketservice.core.service.model.MovieDto;
+import com.epam.training.ticketservice.ui.command.model.MovieDtoList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.shell.Availability;
 import org.springframework.shell.standard.ShellComponent;
@@ -18,13 +19,25 @@ public class MovieCommand {
     private final AvailabilityService availabilityService;
 
     @ShellMethod(value = "Create a movie", key = "create movie")
-    public void createMovie(@ShellOption String title, @ShellOption String genre, @ShellOption int minutes) {
-        movieService.createMovie(title, genre, minutes);
+    public MovieDto createMovie(@ShellOption String title, @ShellOption String genre, @ShellOption int minutes) {
+        MovieDto movieDto = MovieDto.builder()
+                .title(title)
+                .genre(genre)
+                .minutes(minutes)
+                .build();
+        movieService.createMovie(movieDto);
+        return movieDto;
     }
 
     @ShellMethod(value = "Update a movie", key = "update movie")
-    public void updateMovie(@ShellOption String title, @ShellOption String genre, @ShellOption int minutes) {
-        movieService.updateMovie(title, genre, minutes);
+    public MovieDto updateMovie(@ShellOption String title, @ShellOption String genre, @ShellOption int minutes) {
+        MovieDto movieDto = MovieDto.builder()
+                .title(title)
+                .genre(genre)
+                .minutes(minutes)
+                .build();
+        movieService.updateMovie(movieDto);
+        return movieDto;
     }
 
     @ShellMethod(value = "Delete a movie", key = "delete movie")
@@ -33,7 +46,7 @@ public class MovieCommand {
     }
 
     @ShellMethod(value = "List movies", key = "list movies")
-    public MovieList listMovies() {
+    public MovieDtoList listMovies() {
         return movieService.getMovieList();
     }
 
