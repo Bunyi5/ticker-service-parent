@@ -11,5 +11,7 @@ public interface MovieService {
 
     void deleteMovie(String title);
 
-    MovieDtoList getMovieList();
+    MovieDtoList getMovieDtoList();
+
+    MovieDto getMovieDtoByTitle(String title);
 }

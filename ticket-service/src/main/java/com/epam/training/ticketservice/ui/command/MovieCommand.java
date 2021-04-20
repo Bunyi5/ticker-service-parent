@@ -20,22 +20,14 @@ public class MovieCommand {
 
     @ShellMethod(value = "Create a movie", key = "create movie")
     public MovieDto createMovie(@ShellOption String title, @ShellOption String genre, @ShellOption int minutes) {
-        MovieDto movieDto = MovieDto.builder()
-                .title(title)
-                .genre(genre)
-                .minutes(minutes)
-                .build();
+        MovieDto movieDto = buildMovieDto(title, genre, minutes);
         movieService.createMovie(movieDto);
         return movieDto;
     }
 
     @ShellMethod(value = "Update a movie", key = "update movie")
     public MovieDto updateMovie(@ShellOption String title, @ShellOption String genre, @ShellOption int minutes) {
-        MovieDto movieDto = MovieDto.builder()
-                .title(title)
-                .genre(genre)
-                .minutes(minutes)
-                .build();
+        MovieDto movieDto = buildMovieDto(title, genre, minutes);
         movieService.updateMovie(movieDto);
         return movieDto;
     }
@@ -47,11 +39,19 @@ public class MovieCommand {
 
     @ShellMethod(value = "List movies", key = "list movies")
     public MovieDtoList listMovies() {
-        return movieService.getMovieList();
+        return movieService.getMovieDtoList();
     }
 
     @ShellMethodAvailability({"create movie", "update movie", "delete movie"})
     public Availability isSignedInAccountAdmin() {
         return availabilityService.isSignedInAccountAdmin();
+    }
+
+    private MovieDto buildMovieDto(String title, String genre, int minutes) {
+        return MovieDto.builder()
+                .title(title)
+                .genre(genre)
+                .minutes(minutes)
+                .build();
     }
 }
