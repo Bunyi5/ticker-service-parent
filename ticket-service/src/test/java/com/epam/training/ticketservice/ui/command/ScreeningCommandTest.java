@@ -1,9 +1,9 @@
 package com.epam.training.ticketservice.ui.command;
 
-import com.epam.training.ticketservice.core.service.AvailabilityService;
-import com.epam.training.ticketservice.core.service.ScreeningService;
-import com.epam.training.ticketservice.core.service.model.ScreeningDto;
-import com.epam.training.ticketservice.ui.command.model.ScreeningDtoList;
+import com.epam.training.ticketservice.ui.service.AvailabilityService;
+import com.epam.training.ticketservice.core.screening.ScreeningService;
+import com.epam.training.ticketservice.core.screening.model.ScreeningDto;
+import com.epam.training.ticketservice.core.screening.model.ScreeningDtoList;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

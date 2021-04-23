@@ -1,9 +1,9 @@
 package com.epam.training.ticketservice.ui.command;
 
-import com.epam.training.ticketservice.core.service.AvailabilityService;
-import com.epam.training.ticketservice.core.service.RoomService;
-import com.epam.training.ticketservice.core.service.model.RoomDto;
-import com.epam.training.ticketservice.ui.command.model.RoomDtoList;
+import com.epam.training.ticketservice.ui.service.AvailabilityService;
+import com.epam.training.ticketservice.core.room.RoomService;
+import com.epam.training.ticketservice.core.room.model.RoomDto;
+import com.epam.training.ticketservice.core.room.model.RoomDtoList;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
