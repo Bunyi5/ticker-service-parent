@@ -39,8 +39,8 @@ public class ScreeningValidatorImpl implements ScreeningValidator {
     }
 
     private void validateScreeningTime(Screening newScreening, Screening existingScreening) {
-        int lengthOfNew = newScreening.getMovie().getMinutes();
-        int lengthOfExisting = existingScreening.getMovie().getMinutes();
+        int lengthOfNew = newScreening.getMovie().getLength();
+        int lengthOfExisting = existingScreening.getMovie().getLength();
 
         LocalTime startTimeOfNew = newScreening.getStartTime();
         LocalTime startTimeOfExisting = existingScreening.getStartTime();

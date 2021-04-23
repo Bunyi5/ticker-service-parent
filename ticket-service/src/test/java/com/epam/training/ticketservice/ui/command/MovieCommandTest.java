@@ -27,11 +27,11 @@ public class MovieCommandTest {
 
     private static final String TITLE = "Sátántangó";
     private static final String GENRE = "drama";
-    private static final int MINUTES = 450;
+    private static final int LENGTH = 450;
     private static final MovieDto MOVIE_DTO = MovieDto.builder()
             .title(TITLE)
             .genre(GENRE)
-            .minutes(MINUTES)
+            .length(LENGTH)
             .build();
 
     @BeforeEach
@@ -45,7 +45,7 @@ public class MovieCommandTest {
         Mockito.doNothing().when(movieService).createMovie(MOVIE_DTO);
 
         // When
-        MovieDto actual = movieCommand.createMovie(TITLE, GENRE, MINUTES);
+        MovieDto actual = movieCommand.createMovie(TITLE, GENRE, LENGTH);
 
         // Then
         Assertions.assertEquals(MOVIE_DTO, actual);
@@ -59,7 +59,7 @@ public class MovieCommandTest {
         Mockito.doNothing().when(movieService).updateMovie(MOVIE_DTO);
 
         // When
-        MovieDto actual = movieCommand.updateMovie(TITLE, GENRE, MINUTES);
+        MovieDto actual = movieCommand.updateMovie(TITLE, GENRE, LENGTH);
 
         // Then
         Assertions.assertEquals(MOVIE_DTO, actual);

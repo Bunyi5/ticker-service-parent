@@ -35,14 +35,14 @@ public class ScreeningDetailsProviderTest {
         long id = 10L;
         String title = "Sátántangó";
         String genre = "drama";
-        int minutes = 450;
+        int length = 450;
         MovieDto movieDto = MovieDto.builder()
                 .id(id)
                 .title(title)
                 .genre(genre)
-                .minutes(minutes)
+                .length(length)
                 .build();
-        Movie expected = new Movie(id, title, genre, minutes);
+        Movie expected = new Movie(id, title, genre, length);
 
         Mockito.when(movieService.getMovieDtoByTitle(title))
                 .thenReturn(movieDto);

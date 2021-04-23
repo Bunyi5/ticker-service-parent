@@ -27,13 +27,13 @@ public class MovieServiceImplTest {
 
     private static final String TITLE = "Sátántangó";
     private static final String GENRE = "drama";
-    private static final int MINUTES = 450;
+    private static final int LENGTH = 450;
     private static final MovieDto MOVIE_DTO = MovieDto.builder()
             .title(TITLE)
             .genre(GENRE)
-            .minutes(MINUTES)
+            .length(LENGTH)
             .build();
-    private static final Movie MOVIE_ENTITY = new Movie(null, TITLE, GENRE, MINUTES);
+    private static final Movie MOVIE_ENTITY = new Movie(null, TITLE, GENRE, LENGTH);
 
     @BeforeEach
     public void init() {
@@ -70,7 +70,7 @@ public class MovieServiceImplTest {
         MovieDto movieDto = MovieDto.builder()
                 .title(null)
                 .genre(MOVIE_DTO.getGenre())
-                .minutes(MOVIE_DTO.getMinutes())
+                .length(MOVIE_DTO.getLength())
                 .build();
 
         // When
@@ -87,7 +87,7 @@ public class MovieServiceImplTest {
         MovieDto movieDto = MovieDto.builder()
                 .title(MOVIE_DTO.getTitle())
                 .genre(null)
-                .minutes(MOVIE_DTO.getMinutes())
+                .length(MOVIE_DTO.getLength())
                 .build();
 
         // When
@@ -99,12 +99,12 @@ public class MovieServiceImplTest {
     }
 
     @Test
-    public void testCreateMovieShouldThrowNullPointerExceptionWhenTheMovieMinutesIsZero() {
+    public void testCreateMovieShouldThrowNullPointerExceptionWhenTheMovieLengthIsZero() {
         // Given
         MovieDto movieDto = MovieDto.builder()
                 .title(MOVIE_DTO.getTitle())
                 .genre(MOVIE_DTO.getGenre())
-                .minutes(0)
+                .length(0)
                 .build();
 
         // When
@@ -136,7 +136,7 @@ public class MovieServiceImplTest {
         MovieDto movieDto = MovieDto.builder()
                 .title("notTitle")
                 .genre(MOVIE_DTO.getGenre())
-                .minutes(MOVIE_DTO.getMinutes())
+                .length(MOVIE_DTO.getLength())
                 .build();
 
         Mockito.when(movieRepository.findByTitle(movieDto.getTitle()))

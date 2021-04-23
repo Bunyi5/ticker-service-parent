@@ -15,10 +15,10 @@ public class MovieDto {
     private final Long id;
     private final String title;
     private final String genre;
-    private final int minutes;
+    private final int length;
 
     @Override
     public String toString() {
-        return title + " (" + genre + ", " + minutes + " minutes)";
+        return title + " (" + genre + ", " + length + " minutes)";
     }
 }

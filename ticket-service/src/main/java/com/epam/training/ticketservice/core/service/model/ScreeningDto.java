@@ -18,14 +18,14 @@ public class ScreeningDto {
     private final Long id;
     private final String movieTitle;
     private final String movieGenre;
-    private final long movieMinutes;
+    private final long movieLength;
     private final String roomName;
     private final LocalDate startDate;
     private final LocalTime startTime;
 
     @Override
     public String toString() {
-        return movieTitle + " (" + movieGenre + ", " + movieMinutes
+        return movieTitle + " (" + movieGenre + ", " + movieLength
                 + " minutes), screened in room " + roomName
                 + ", at " + startDate.toString() + " " + startTime.toString();
     }

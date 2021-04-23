@@ -22,5 +22,5 @@ public class Movie {
     @Column(unique = true)
     private String title;
     private String genre;
-    private int minutes;
+    private int length;
 }

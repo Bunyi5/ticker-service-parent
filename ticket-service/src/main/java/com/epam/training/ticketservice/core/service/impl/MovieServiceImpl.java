@@ -50,20 +50,20 @@ public class MovieServiceImpl implements MovieService {
     }
 
     private void saveMovie(Long id, MovieDto movieDto) {
-        checkMovieDto(movieDto);
+        checkNullInMovieDto(movieDto);
         Movie movie = new Movie(id,
                 movieDto.getTitle(),
                 movieDto.getGenre(),
-                movieDto.getMinutes());
+                movieDto.getLength());
         movieRepository.save(movie);
     }
 
-    private void checkMovieDto(MovieDto movieDto) {
+    private void checkNullInMovieDto(MovieDto movieDto) {
         Objects.requireNonNull(movieDto, "Movie cannot be null");
         Objects.requireNonNull(movieDto.getTitle(), "Movie Title cannot be null");
         Objects.requireNonNull(movieDto.getGenre(), "Movie Genre cannot be null");
-        if (movieDto.getMinutes() <= 0) {
-            throw new NullPointerException("Movie Minutes cannot be zero or less");
+        if (movieDto.getLength() <= 0) {
+            throw new NullPointerException("Movie Length cannot be zero or less");
         }
     }
 
@@ -82,7 +82,7 @@ public class MovieServiceImpl implements MovieService {
                 .id(movie.getId())
                 .title(movie.getTitle())
                 .genre(movie.getGenre())
-                .minutes(movie.getMinutes())
+                .length(movie.getLength())
                 .build();
     }
 }

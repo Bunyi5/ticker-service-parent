@@ -50,7 +50,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     private void saveRoom(Long id, RoomDto roomDto) {
-        checkRoomDto(roomDto);
+        checkNullInRoomDto(roomDto);
         Room room = new Room(id,
                 roomDto.getRoomName(),
                 roomDto.getRoomSeat(),
@@ -59,7 +59,7 @@ public class RoomServiceImpl implements RoomService {
         roomRepository.save(room);
     }
 
-    private void checkRoomDto(RoomDto roomDto) {
+    private void checkNullInRoomDto(RoomDto roomDto) {
         Objects.requireNonNull(roomDto, "Room cannot be null");
         Objects.requireNonNull(roomDto.getRoomName(), "Room Name cannot be null");
         if (roomDto.getRoomRow() <= 0) {

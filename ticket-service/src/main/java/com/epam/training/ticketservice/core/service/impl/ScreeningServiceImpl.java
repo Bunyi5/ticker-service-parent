@@ -70,7 +70,7 @@ public class ScreeningServiceImpl implements ScreeningService {
                 .id(screening.getId())
                 .movieTitle(screening.getMovie().getTitle())
                 .movieGenre(screening.getMovie().getGenre())
-                .movieMinutes(screening.getMovie().getMinutes())
+                .movieLength(screening.getMovie().getLength())
                 .roomName(screening.getRoom().getRoomName())
                 .startDate(screening.getStartDate())
                 .startTime(screening.getStartTime())

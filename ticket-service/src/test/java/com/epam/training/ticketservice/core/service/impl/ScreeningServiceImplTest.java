@@ -47,7 +47,7 @@ public class ScreeningServiceImplTest {
     private static final ScreeningDto SCREENING_DTO = ScreeningDto.builder()
             .movieTitle(MOVIE_ENTITY.getTitle())
             .movieGenre(MOVIE_ENTITY.getGenre())
-            .movieMinutes(MOVIE_ENTITY.getMinutes())
+            .movieLength(MOVIE_ENTITY.getLength())
             .roomName(ROOM_ENTITY.getRoomName())
             .startDate(START_DATE)
             .startTime(START_TIME)

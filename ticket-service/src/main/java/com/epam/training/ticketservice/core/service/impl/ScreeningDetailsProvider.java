@@ -30,7 +30,7 @@ public class ScreeningDetailsProvider {
         return new Movie(movieDto.getId(),
                 movieDto.getTitle(),
                 movieDto.getGenre(),
-                movieDto.getMinutes());
+                movieDto.getLength());
     }
 
     private Room convertDtoToRoomEntity(RoomDto roomDto) {
