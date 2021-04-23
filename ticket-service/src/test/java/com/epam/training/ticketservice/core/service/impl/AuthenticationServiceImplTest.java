@@ -11,10 +11,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthenticationServiceImplTest {
@@ -23,15 +26,20 @@ public class AuthenticationServiceImplTest {
 
     @Mock
     private SecurityContext securityContext;
+    @Mock
+    private PasswordEncoder passwordEncoder;
+    @Mock
+    private UserDetailsService userDetailsService;
 
     @BeforeEach
     public void init() {
-        authenticationService = new AuthenticationServiceImpl();
+        authenticationService = new AuthenticationServiceImpl(passwordEncoder, userDetailsService);
     }
 
     @Test
-    public void testSetAuthenticationShouldCallSecurityContextWithTheRightParameters() {
+    public void testSignInShouldCallServicesWithTheRightParameters() {
         // Given
+        String password = "admin";
         Account adminAccount = new Account(200L, "admin",
                 "$2y$04$LAI2hWUb1WB7hlnSfHCAEuqkybgnr7RKLJrBIi5m4gp6OOUEwCvmi", true);
         UserDetails adminAccountDetails = new AccountDetails(adminAccount);
@@ -39,13 +47,44 @@ public class AuthenticationServiceImplTest {
                 new UsernamePasswordAuthenticationToken(adminAccountDetails, null, null);
 
         SecurityContextHolder.setContext(securityContext);
+        Mockito.when(userDetailsService.loadUserByUsername(adminAccount.getUsername()))
+                .thenReturn(adminAccountDetails);
+        Mockito.when(passwordEncoder.matches(password, adminAccount.getPassword()))
+                .thenReturn(true);
+        Mockito.doNothing().when(securityContext).setAuthentication(adminUsernamePasswordAuthenticationToken);
 
         // When
-        authenticationService.setAuthentication(adminAccountDetails);
+        authenticationService.signIn(adminAccount.getUsername(), password);
 
         // Then
+        Mockito.verify(userDetailsService).loadUserByUsername(adminAccount.getUsername());
+        Mockito.verify(passwordEncoder).matches(password, adminAccount.getPassword());
         Mockito.verify(securityContext).setAuthentication(adminUsernamePasswordAuthenticationToken);
-        Mockito.verifyNoMoreInteractions(securityContext);
+        Mockito.verifyNoMoreInteractions(userDetailsService, passwordEncoder, securityContext);
+    }
+
+    @Test
+    public void testSignInShouldThrowBadCredentialsExceptionWhenThePasswordsNotMatch() {
+        // Given
+        String password = "notAdmin";
+        Account adminAccount = new Account(200L, "admin",
+                "$2y$04$LAI2hWUb1WB7hlnSfHCAEuqkybgnr7RKLJrBIi5m4gp6OOUEwCvmi", true);
+        UserDetails adminAccountDetails = new AccountDetails(adminAccount);
+
+        SecurityContextHolder.setContext(securityContext);
+        Mockito.when(userDetailsService.loadUserByUsername(adminAccount.getUsername()))
+                .thenReturn(adminAccountDetails);
+        Mockito.when(passwordEncoder.matches(password, adminAccount.getPassword()))
+                .thenReturn(false);
+
+        // When
+        Assertions.assertThrows(BadCredentialsException.class,
+                () -> authenticationService.signIn(adminAccount.getUsername(), password));
+
+        // Then
+        Mockito.verify(userDetailsService).loadUserByUsername(adminAccount.getUsername());
+        Mockito.verify(passwordEncoder).matches(password, adminAccount.getPassword());
+        Mockito.verifyNoMoreInteractions(userDetailsService, passwordEncoder);
     }
 
     @Test

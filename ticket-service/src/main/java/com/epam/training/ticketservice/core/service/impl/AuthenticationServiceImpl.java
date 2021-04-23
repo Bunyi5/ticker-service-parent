@@ -3,21 +3,32 @@ package com.epam.training.ticketservice.core.service.impl;
 import com.epam.training.ticketservice.core.persistence.entity.Account;
 import com.epam.training.ticketservice.core.service.AuthenticationService;
 import com.epam.training.ticketservice.core.service.model.AccountDetails;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-    @Override
-    public void setAuthentication(UserDetails userDetails) {
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(userDetails, null, null);
+    private final PasswordEncoder passwordEncoder;
+    private final UserDetailsService userDetailsService;
 
-        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+    @Override
+    public void signIn(String username, String password) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+        if (passwordEncoder.matches(password, userDetails.getPassword())) {
+            setAuthentication(userDetails);
+        } else {
+            throw new BadCredentialsException("Incorrect password!");
+        }
     }
 
     @Override
@@ -46,6 +57,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         } catch (AuthenticationCredentialsNotFoundException e) {
             return false;
         }
+    }
+
+    private void setAuthentication(UserDetails userDetails) {
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                new UsernamePasswordAuthenticationToken(userDetails, null, null);
+
+        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
     }
 
     private AccountDetails getAuthPrinciple(Object principal) {

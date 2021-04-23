@@ -3,7 +3,6 @@ package com.epam.training.ticketservice.core.service.impl;
 import com.epam.training.ticketservice.core.persistence.entity.Account;
 import com.epam.training.ticketservice.core.service.AuthenticationService;
 import com.epam.training.ticketservice.core.service.LoginService;
-import com.epam.training.ticketservice.core.service.model.AccountDetails;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,10 +11,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 public class LoginServiceImplTest {
@@ -23,61 +18,27 @@ public class LoginServiceImplTest {
     private LoginService loginService;
 
     @Mock
-    private PasswordEncoder passwordEncoder;
-    @Mock
-    private UserDetailsService userDetailsService;
-    @Mock
     private AuthenticationService authenticationService;
 
     @BeforeEach
     public void init() {
-        loginService = new LoginServiceImpl(passwordEncoder, userDetailsService, authenticationService);
+        loginService = new LoginServiceImpl(authenticationService);
     }
 
     @Test
-    public void testSignInPrivilegedShouldCallServicesWithTheRightParameters() {
+    public void testSignInPrivilegedShouldCallAuthenticationServiceWithTheRightParameters() {
         // Given
+        String username = "admin";
         String password = "admin";
-        Account adminAccount = new Account(200L, "admin",
-                "$2y$04$LAI2hWUb1WB7hlnSfHCAEuqkybgnr7RKLJrBIi5m4gp6OOUEwCvmi", true);
-        UserDetails adminAccountDetails = new AccountDetails(adminAccount);
 
-        Mockito.when(userDetailsService.loadUserByUsername(adminAccount.getUsername()))
-                .thenReturn(adminAccountDetails);
-        Mockito.when(passwordEncoder.matches(password, adminAccount.getPassword()))
-                .thenReturn(true);
+        Mockito.doNothing().when(authenticationService).signIn(username, password);
 
         // When
-        loginService.signInPrivileged(adminAccount.getUsername(), password);
+        loginService.signInPrivileged(username, password);
 
         // Then
-        Mockito.verify(userDetailsService).loadUserByUsername(adminAccount.getUsername());
-        Mockito.verify(passwordEncoder).matches(password, adminAccount.getPassword());
-        Mockito.verify(authenticationService).setAuthentication(adminAccountDetails);
-        Mockito.verifyNoMoreInteractions(userDetailsService, passwordEncoder, authenticationService);
-    }
-
-    @Test
-    public void testSignInPrivilegedShouldThrowExceptionWhenAdminUsesWrongPassword() {
-        // Given
-        String wrongPassword = "notAdmin";
-        Account adminAccount = new Account(200L, "admin",
-                "$2y$04$LAI2hWUb1WB7hlnSfHCAEuqkybgnr7RKLJrBIi5m4gp6OOUEwCvmi", true);
-        UserDetails adminAccountDetails = new AccountDetails(adminAccount);
-
-        Mockito.when(userDetailsService.loadUserByUsername(adminAccount.getUsername()))
-                .thenReturn(adminAccountDetails);
-        Mockito.when(passwordEncoder.matches(wrongPassword, adminAccount.getPassword()))
-                .thenReturn(false);
-
-        // When
-        Assertions.assertThrows(BadCredentialsException.class,
-                () -> loginService.signInPrivileged(adminAccount.getUsername(), wrongPassword));
-
-        // Then
-        Mockito.verify(userDetailsService).loadUserByUsername(adminAccount.getUsername());
-        Mockito.verify(passwordEncoder).matches(wrongPassword, adminAccount.getPassword());
-        Mockito.verifyNoMoreInteractions(userDetailsService, passwordEncoder);
+        Mockito.verify(authenticationService).signIn(username, password);
+        Mockito.verifyNoMoreInteractions(authenticationService);
     }
 
     @Test
