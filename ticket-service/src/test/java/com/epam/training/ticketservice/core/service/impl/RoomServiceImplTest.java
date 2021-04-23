@@ -176,11 +176,26 @@ public class RoomServiceImplTest {
                 .thenReturn(List.of(ROOM_ENTITY));
 
         // When
-        RoomDtoList actual = roomService.getRoomList();
+        RoomDtoList actual = roomService.getRoomDtoList();
 
         // Then
         Assertions.assertEquals(expected, actual);
         Mockito.verify(roomRepository).findAll();
+        Mockito.verifyNoMoreInteractions(roomRepository);
+    }
+
+    @Test
+    public void testGetRoomDtoByRoomNameShouldReturnExpectedResult() {
+        // Given
+        Mockito.when(roomRepository.findByRoomName(ROOM_ENTITY.getRoomName()))
+                .thenReturn(Optional.of(ROOM_ENTITY));
+
+        // When
+        RoomDto actual = roomService.getRoomDtoByRoomName(ROOM_ENTITY.getRoomName());
+
+        // Then
+        Assertions.assertEquals(ROOM_DTO, actual);
+        Mockito.verify(roomRepository).findByRoomName(ROOM_ENTITY.getRoomName());
         Mockito.verifyNoMoreInteractions(roomRepository);
     }
 }

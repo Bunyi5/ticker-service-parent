@@ -12,6 +12,7 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MovieDto {
 
+    private final Long id;
     private final String title;
     private final String genre;
     private final int minutes;

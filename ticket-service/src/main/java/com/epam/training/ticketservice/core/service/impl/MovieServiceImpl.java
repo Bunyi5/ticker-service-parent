@@ -27,12 +27,8 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public void updateMovie(MovieDto movieDto) {
-        Optional<Movie> maybeMovie = movieRepository.findByTitle(movieDto.getTitle());
-        if (maybeMovie.isEmpty()) {
-            throw new NoSuchElementException("Movie not found!");
-        } else {
-            saveMovie(maybeMovie.get().getId(), movieDto);
-        }
+        Movie movie = getMovieByTitle(movieDto.getTitle());
+        saveMovie(movie.getId(), movieDto);
     }
 
     @Override
@@ -42,8 +38,15 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public MovieDtoList getMovieList() {
-        return new MovieDtoList(getMovieDtoList());
+    public MovieDtoList getMovieDtoList() {
+        List<MovieDto> movieDtoList = movieRepository.findAll().stream()
+                .map(this::convertEntityToDto).collect(Collectors.toList());
+        return new MovieDtoList(movieDtoList);
+    }
+
+    @Override
+    public MovieDto getMovieDtoByTitle(String title) {
+        return convertEntityToDto(getMovieByTitle(title));
     }
 
     private void saveMovie(Long id, MovieDto movieDto) {
@@ -64,12 +67,19 @@ public class MovieServiceImpl implements MovieService {
         }
     }
 
-    private List<MovieDto> getMovieDtoList() {
-        return movieRepository.findAll().stream().map(this::convertEntityToDto).collect(Collectors.toList());
+    private Movie getMovieByTitle(String title) {
+        Optional<Movie> optionalMovie = movieRepository.findByTitle(title);
+
+        if (optionalMovie.isEmpty()) {
+            throw new NoSuchElementException("Movie not found!");
+        }
+
+        return optionalMovie.get();
     }
 
     private MovieDto convertEntityToDto(Movie movie) {
         return MovieDto.builder()
+                .id(movie.getId())
                 .title(movie.getTitle())
                 .genre(movie.getGenre())
                 .minutes(movie.getMinutes())

@@ -45,9 +45,10 @@ public class MovieCommandTest {
         Mockito.doNothing().when(movieService).createMovie(MOVIE_DTO);
 
         // When
-        movieCommand.createMovie(TITLE, GENRE, MINUTES);
+        MovieDto actual = movieCommand.createMovie(TITLE, GENRE, MINUTES);
 
         // Then
+        Assertions.assertEquals(MOVIE_DTO, actual);
         Mockito.verify(movieService).createMovie(MOVIE_DTO);
         Mockito.verifyNoMoreInteractions(movieService);
     }
@@ -58,9 +59,10 @@ public class MovieCommandTest {
         Mockito.doNothing().when(movieService).updateMovie(MOVIE_DTO);
 
         // When
-        movieCommand.updateMovie(TITLE, GENRE, MINUTES);
+        MovieDto actual = movieCommand.updateMovie(TITLE, GENRE, MINUTES);
 
         // Then
+        Assertions.assertEquals(MOVIE_DTO, actual);
         Mockito.verify(movieService).updateMovie(MOVIE_DTO);
         Mockito.verifyNoMoreInteractions(movieService);
     }
@@ -83,7 +85,7 @@ public class MovieCommandTest {
         // Given
         MovieDtoList expected = new MovieDtoList(List.of(MOVIE_DTO));
 
-        Mockito.when(movieService.getMovieList())
+        Mockito.when(movieService.getMovieDtoList())
                 .thenReturn(expected);
 
         // When
@@ -91,7 +93,7 @@ public class MovieCommandTest {
 
         // Then
         Assertions.assertEquals(expected, actual);
-        Mockito.verify(movieService).getMovieList();
+        Mockito.verify(movieService).getMovieDtoList();
         Mockito.verifyNoMoreInteractions(movieService);
     }
 

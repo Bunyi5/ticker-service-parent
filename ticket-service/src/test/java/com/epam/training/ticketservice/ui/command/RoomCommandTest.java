@@ -45,9 +45,10 @@ public class RoomCommandTest {
         Mockito.doNothing().when(roomService).createRoom(ROOM_DTO);
 
         // When
-        roomCommand.createRoom(ROOM_NAME, ROOM_ROW, ROOM_COLUMN);
+        RoomDto actual = roomCommand.createRoom(ROOM_NAME, ROOM_ROW, ROOM_COLUMN);
 
         // Then
+        Assertions.assertEquals(ROOM_DTO, actual);
         Mockito.verify(roomService).createRoom(ROOM_DTO);
         Mockito.verifyNoMoreInteractions(roomService);
     }
@@ -58,9 +59,10 @@ public class RoomCommandTest {
         Mockito.doNothing().when(roomService).updateRoom(ROOM_DTO);
 
         // When
-        roomCommand.updateRoom(ROOM_NAME, ROOM_ROW, ROOM_COLUMN);
+        RoomDto actual = roomCommand.updateRoom(ROOM_NAME, ROOM_ROW, ROOM_COLUMN);
 
         // Then
+        Assertions.assertEquals(ROOM_DTO, actual);
         Mockito.verify(roomService).updateRoom(ROOM_DTO);
         Mockito.verifyNoMoreInteractions(roomService);
     }
@@ -83,7 +85,7 @@ public class RoomCommandTest {
         // Given
         RoomDtoList expected = new RoomDtoList(List.of(ROOM_DTO));
 
-        Mockito.when(roomService.getRoomList())
+        Mockito.when(roomService.getRoomDtoList())
                 .thenReturn(expected);
 
         // When
@@ -91,7 +93,7 @@ public class RoomCommandTest {
 
         // Then
         Assertions.assertEquals(expected, actual);
-        Mockito.verify(roomService).getRoomList();
+        Mockito.verify(roomService).getRoomDtoList();
         Mockito.verifyNoMoreInteractions(roomService);
     }
 

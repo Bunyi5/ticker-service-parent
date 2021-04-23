@@ -1,6 +1,6 @@
 package com.epam.training.ticketservice.ui.command.model;
 
-import com.epam.training.ticketservice.core.service.model.MovieDto;
+import com.epam.training.ticketservice.core.service.model.ScreeningDto;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,16 +12,16 @@ import java.util.stream.Collectors;
 @Getter
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public class MovieDtoList {
+public class ScreeningDtoList {
 
-    private final List<MovieDto> movieDtoList;
+    private final List<ScreeningDto> screeningDtoList;
 
     @Override
     public String toString() {
-        if (movieDtoList.isEmpty()) {
-            return "There are no movies at the moment";
+        if (screeningDtoList.isEmpty()) {
+            return "There are no screenings";
         } else {
-            return movieDtoList.stream().map(Objects::toString).collect(Collectors.joining("\n"));
+            return screeningDtoList.stream().map(Objects::toString).collect(Collectors.joining("\n"));
         }
     }
 }

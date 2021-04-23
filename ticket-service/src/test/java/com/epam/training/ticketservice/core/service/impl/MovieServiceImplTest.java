@@ -175,11 +175,26 @@ public class MovieServiceImplTest {
                 .thenReturn(List.of(MOVIE_ENTITY));
 
         // When
-        MovieDtoList actual = movieService.getMovieList();
+        MovieDtoList actual = movieService.getMovieDtoList();
 
         // Then
         Assertions.assertEquals(expected, actual);
         Mockito.verify(movieRepository).findAll();
+        Mockito.verifyNoMoreInteractions(movieRepository);
+    }
+
+    @Test
+    public void testGetMovieDtoByTitleShouldReturnExpectedResult() {
+        // Given
+        Mockito.when(movieRepository.findByTitle(MOVIE_ENTITY.getTitle()))
+                .thenReturn(Optional.of(MOVIE_ENTITY));
+
+        // When
+        MovieDto actual = movieService.getMovieDtoByTitle(MOVIE_ENTITY.getTitle());
+
+        // Then
+        Assertions.assertEquals(MOVIE_DTO, actual);
+        Mockito.verify(movieRepository).findByTitle(MOVIE_ENTITY.getTitle());
         Mockito.verifyNoMoreInteractions(movieRepository);
     }
 }
