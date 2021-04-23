@@ -1,7 +1,7 @@
 package com.epam.training.ticketservice.ui.command;
 
-import com.epam.training.ticketservice.core.service.AvailabilityService;
-import com.epam.training.ticketservice.core.service.LoginService;
+import com.epam.training.ticketservice.ui.service.AvailabilityService;
+import com.epam.training.ticketservice.core.account.LoginService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
